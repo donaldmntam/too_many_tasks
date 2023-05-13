@@ -39,4 +39,16 @@ class Theme extends InheritedWidget {
       fontFamily: fontFamily,
     );
   }
+
+  BoxShadow boxShadow({
+    BlurStyle blurStyle = BlurStyle.normal,
+  }) {
+    return BoxShadow(
+      color: const Color(0x10000000),
+      blurRadius: 4,
+      spreadRadius: 0, 
+      offset: const Offset(0, 4),
+      blurStyle: blurStyle,
+    );
+  }
 }

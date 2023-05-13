@@ -16,7 +16,7 @@ class MainApp extends StatelessWidget {
       home: Theme(
         colors: testColors,
         fontFamily: "",
-        child: task_list.Page()
+        child: task_list.Widget()
       ),
     );
   }
