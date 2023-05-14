@@ -1,10 +1,20 @@
 import 'package:flutter/material.dart' hide Theme, Page;
+import 'package:too_many_tasks/common/services/clock.dart';
 import 'package:too_many_tasks/task_list/page.dart' as task_list;
 
+import 'common/services/services.dart';
 import 'common/theme/theme.dart';
-
 void main() {
   runApp(const MainApp());
+}
+
+class FrozenClock implements Clock {
+  const FrozenClock();
+
+  @override
+  DateTime now() {
+    return DateTime(2023, 5, 14);
+  }
 }
 
 class MainApp extends StatelessWidget {
@@ -13,10 +23,14 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const MaterialApp(
-      home: Theme(
-        colors: testColors,
-        fontFamily: "",
-        child: task_list.Widget()
+      home: Services(
+        // clock: DefaultClock(),
+        clock: FrozenClock(),
+        child: Theme(
+          colors: testColors,
+          fontFamily: "",
+          child: task_list.Page()
+        ),
       ),
     );
   }

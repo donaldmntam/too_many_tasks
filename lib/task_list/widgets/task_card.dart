@@ -4,6 +4,7 @@ import 'package:flutter/material.dart' hide Theme, Widget;
 import 'package:flutter/widgets.dart' as flutter show Widget;
 import 'package:too_many_tasks/common/functions/date_functions.dart';
 import 'package:too_many_tasks/common/models/task.dart';
+import 'package:too_many_tasks/common/services/services.dart';
 import 'package:too_many_tasks/common/theme/theme.dart';
 
 const _headerWidth = 32.0;
@@ -12,17 +13,19 @@ final _borderRadius = BorderRadius.circular(12);
 const _padding = EdgeInsets.all(14);
 
 abstract interface class Listener {
-  void onPinPressed();
+  void onPinPressed(int index);
   void onEditPressed();
   void onCheckmarkPressed();
 }
 
+typedef Data = ({int index, Task task, bool pinned});
+
 class Widget extends StatelessWidget {
-  final Task task;
+  final Data data;
   final Listener listener;
 
   const Widget(
-    this.task,
+    this.data,
     this.listener,
     {super.key}
   );
@@ -37,9 +40,9 @@ class Widget extends StatelessWidget {
             Flexible(
               flex: 1,
               fit: FlexFit.tight,
-              child: _Body(task, listener),
+              child: _Body(data, listener),
             ),
-            _CheckMark(task, listener),
+            _CheckMark(data, listener),
           ]
         ),
       )
@@ -57,7 +60,7 @@ class _Background extends StatelessWidget {
     final theme = Theme.of(context);
     return IntrinsicHeight(
       child: Container(
-        clipBehavior: Clip.hardEdge,
+        clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
           color: theme.colors.surface,
           borderRadius: _borderRadius,
@@ -79,11 +82,11 @@ class _Background extends StatelessWidget {
 }
 
 class _Body extends StatelessWidget {
-  final Task task;
+  final Data data;
   final Listener listener;
 
   const _Body(
-    this.task,
+    this.data,
     this.listener,
   );
 
@@ -92,20 +95,20 @@ class _Body extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _Title(task, listener),
+        _Title(data, listener),
         const SizedBox(height: 8),
-        _DueDate(task),
+        _DueDate(data),
       ]
     );
   }
 }
 
 class _Title extends StatelessWidget {
-  final Task task;
+  final Data data;
   final Listener listener;
 
   const _Title(
-    this.task,
+    this.data,
     this.listener,
   );
   
@@ -116,13 +119,13 @@ class _Title extends StatelessWidget {
     return Row(
       children: [
         GestureDetector(
-          onTap: () => listener.onPinPressed(),
+          onTap: () => listener.onPinPressed(data.index),
           child: Transform.rotate(
-            angle: task.pinned ? 0 : pi * 0.5 * 3.5,
+            angle: data.pinned ? 0 : pi * 0.5 * 3.5,
             child: Icon(
               Icons.push_pin_outlined,
               size: 18 * media.textScaleFactor,
-              color: task.pinned
+              color: data.pinned
                 ? theme.colors.onSurface400
                 : theme.colors.onSurface100,
             ),
@@ -130,7 +133,7 @@ class _Title extends StatelessWidget {
         ),
         SizedBox(width: 4 * media.textScaleFactor),
         Text(
-          task.title,
+          data.task.title,
           style: theme.textStyle(
             size: 16,
             weight: FontWeight.w400,
@@ -152,14 +155,25 @@ class _Title extends StatelessWidget {
 }
 
 class _DueDate extends StatelessWidget {
-  final Task task;
+  final Data data;
 
-  const _DueDate(this.task);
+  const _DueDate(this.data);
 
   @override
   flutter.Widget build(BuildContext context) {
     final media = MediaQuery.of(context);
     final theme = Theme.of(context);
+    final services = Services.of(context);
+    final overdue = data.task.dueDate.isAfter(services.clock.now());
+    final text = switch (overdue) {
+      true => "Overdue", // TODO: localization!
+      false => data.task.dueDate.toFormattedString(),
+    };
+    final textColor = switch (overdue) {
+      true => theme.colors.error,
+      false => theme.colors.onSurface400,
+    };
+
     return IntrinsicHeight(
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -171,7 +185,12 @@ class _DueDate extends StatelessWidget {
           ),
           SizedBox(width: 4 * media.textScaleFactor),
           Text(
-            task.dueDate.toFormattedString(),
+            text,
+            style: theme.textStyle(
+              size: 12,
+              weight: FontWeight.w400,
+              color: textColor,
+            )
           ),
         ]
       ),
@@ -180,11 +199,11 @@ class _DueDate extends StatelessWidget {
 }
 
 class _CheckMark extends StatelessWidget {
-  final Task task;
+  final Data data;
   final Listener listener;
 
   const _CheckMark(
-    this.task,
+    this.data,
     this.listener,
   );
 
@@ -200,8 +219,8 @@ class _CheckMark extends StatelessWidget {
           shape: BoxShape.circle,
           color: theme.colors.secondary,
         ),
-        child: task.done ? Center(
-          child: Icon(
+        child: data.task.done ? Center(
+          child: Icon( // TODO: use figma's
             Icons.check,
             color: theme.colors.onSecondary,
             size: _checkboxSize - 12,
