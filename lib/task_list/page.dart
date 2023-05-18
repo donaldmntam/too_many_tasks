@@ -2,6 +2,7 @@ import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:flutter/material.dart';
 import 'package:too_many_tasks/common/functions/scope_functions.dart';
 import 'package:too_many_tasks/common/models/task.dart';
+import 'package:too_many_tasks/common/widgets/task_dialog/task_dialog.dart';
 import 'package:too_many_tasks/task_list/widgets/task_card.dart' as task_card;
 
 const _listPadding = 16.0;
@@ -38,7 +39,10 @@ class _State extends State<Page> implements task_card.Listener {
   
   @override
   void onEditPressed() {
-    // TODO: implement onEditPressed
+    showDialog(
+      context: context,
+      builder: (context) => TaskDialog()
+    );
   }
   
   @override

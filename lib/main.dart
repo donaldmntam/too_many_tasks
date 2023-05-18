@@ -22,15 +22,15 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: Services(
-        // clock: DefaultClock(),
-        clock: FrozenClock(),
-        child: Theme(
-          colors: testColors,
-          fontFamily: "",
-          child: task_list.Page()
-        ),
+    return const Services(
+      // clock: DefaultClock(),
+      clock: FrozenClock(),
+      child: Theme(
+        colors: testColors,
+        fontFamily: "",
+        child: MaterialApp(
+          home: task_list.Page()
+        )
       ),
     );
   }
