@@ -1,6 +1,8 @@
-import 'package:flutter/material.dart' hide Theme, Page;
+import 'package:flutter/material.dart' hide Theme, Page, Localizations;
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:too_many_tasks/common/services/clock.dart';
 import 'package:too_many_tasks/task_list/page.dart' as task_list;
+import 'package:flutter_gen/gen_l10n/strings.dart';
 
 import 'common/services/services.dart';
 import 'common/theme/theme.dart';
@@ -23,12 +25,21 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const Services(
-      // clock: DefaultClock(),
-      clock: FrozenClock(),
+      clock: DefaultClock(),
+      // clock: FrozenClock(),
       child: Theme(
         colors: testColors,
         fontFamily: "",
         child: MaterialApp(
+          localizationsDelegates: [
+            Strings.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: [
+            Locale('en'),
+          ],
           home: task_list.Page()
         )
       ),

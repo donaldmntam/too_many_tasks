@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart' hide Theme;
 import 'package:too_many_tasks/common/theme/theme.dart';
+import 'package:too_many_tasks/common/widgets/tappable/tappable.dart';
 
 import 'constants.dart';
 
@@ -7,10 +8,12 @@ const _padding = EdgeInsets.symmetric(horizontal: 10, vertical: 8);
 
 class PresetRow extends StatelessWidget {
   final List<String> items;
+  final void Function(String) onPressed;
 
   const PresetRow({
     super.key,
     required this.items,
+    required this.onPressed,
   });
 
   @override
@@ -23,7 +26,7 @@ class PresetRow extends StatelessWidget {
             scrollDirection: Axis.horizontal,
             physics: const BouncingScrollPhysics(),
             child: Row( 
-              children: _widgets(items),
+              children: widgets(items),
             ),
           ),
           Align(
@@ -60,25 +63,30 @@ class PresetRow extends StatelessWidget {
       ),
     );
   }
-}
 
-List<Widget> _widgets(List<String> items) {
-  final widgets = List<Widget>.empty(growable: true);
-  widgets.add(const SizedBox(width: horizontalPadding));
-  for (var i = 0; i < items.length; i++) {
-    final item = items[i];
-    widgets.add(_Item(item));
-    if (i == items.length - 1) continue;
-    widgets.add(const SizedBox(width: 4));
+    List<Widget> widgets(List<String> items) {
+    final widgets = List<Widget>.empty(growable: true);
+    widgets.add(const SizedBox(width: horizontalPadding));
+    for (var i = 0; i < items.length; i++) {
+      final item = items[i];
+      widgets.add(
+        Tappable(
+          onPressed: () => onPressed(item),
+          child: _Item(item),
+        )
+      );
+      if (i == items.length - 1) continue;
+      widgets.add(const SizedBox(width: 4));
+    }
+    widgets.add(const SizedBox(width: horizontalPadding));
+    return widgets;
   }
-  widgets.add(const SizedBox(width: horizontalPadding));
-  return widgets;
 }
 
 class _Item extends StatelessWidget {
-  final String text;
+  final String item;
 
-  const _Item(this.text);
+  const _Item(this.item);
 
   @override
   Widget build(BuildContext context) {
@@ -93,7 +101,7 @@ class _Item extends StatelessWidget {
         borderRadius: BorderRadius.circular(4),
       ),
       child: Text(
-        text,
+        item,
         style: theme.textStyle(
           size: 10,
           weight: FontWeight.w400,

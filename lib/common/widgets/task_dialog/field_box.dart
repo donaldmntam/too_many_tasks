@@ -47,15 +47,11 @@ class FieldBox extends StatelessWidget {
               SizedBox(
                 width: _iconSize,
                 height: _iconSize,
-                child: IconButton(
-                  padding: EdgeInsets.zero,
-                  icon: Icon(
-                    icon,
-                    color: theme.colors.onSurface100,
-                    size: _iconSize - 10,
-                  ),
-                  onPressed: () => { print("edit!") }
-                ),
+                child: Icon(
+                  icon,
+                  color: theme.colors.onSurface100,
+                  size: _iconSize - 10,
+                )
               )
             ],
           ),

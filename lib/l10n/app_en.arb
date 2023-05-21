@@ -1,0 +1,6 @@
+{
+    "task_dialog_title": "New Task",
+    "task_dialog_name_field_title": "Task Name",
+    "task_dialog_due_date_field_title": "Due Date",
+    "task_dialog_field_hint": "None"
+}

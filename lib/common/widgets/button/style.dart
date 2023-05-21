@@ -1,0 +1,4 @@
+enum Style {
+  primary,
+  secondary,
+}
