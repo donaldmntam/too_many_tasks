@@ -1,4 +1,6 @@
+import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:flutter/material.dart' hide Theme;
+import 'package:too_many_tasks/common/models/task.dart';
 import 'package:too_many_tasks/common/theme/theme.dart';
 import 'package:too_many_tasks/common/widgets/tappable/tappable.dart';
 
@@ -7,12 +9,12 @@ import 'constants.dart';
 const _padding = EdgeInsets.symmetric(horizontal: 10, vertical: 8);
 
 class PresetRow extends StatelessWidget {
-  final List<String> items;
-  final void Function(String) onPressed;
+  final IList<TaskPreset> presets;
+  final void Function(TaskPreset) onPressed;
 
   const PresetRow({
     super.key,
-    required this.items,
+    required this.presets,
     required this.onPressed,
   });
 
@@ -26,7 +28,7 @@ class PresetRow extends StatelessWidget {
             scrollDirection: Axis.horizontal,
             physics: const BouncingScrollPhysics(),
             child: Row( 
-              children: widgets(items),
+              children: widgets(presets),
             ),
           ),
           Align(
@@ -64,18 +66,18 @@ class PresetRow extends StatelessWidget {
     );
   }
 
-    List<Widget> widgets(List<String> items) {
+    List<Widget> widgets(IList<TaskPreset> presets) {
     final widgets = List<Widget>.empty(growable: true);
     widgets.add(const SizedBox(width: horizontalPadding));
-    for (var i = 0; i < items.length; i++) {
-      final item = items[i];
+    for (var i = 0; i < presets.length; i++) {
+      final preset = presets[i];
       widgets.add(
         Tappable(
-          onPressed: () => onPressed(item),
-          child: _Item(item),
+          onPressed: () => onPressed(preset),
+          child: _Item(preset),
         )
       );
-      if (i == items.length - 1) continue;
+      if (i == presets.length - 1) continue;
       widgets.add(const SizedBox(width: 4));
     }
     widgets.add(const SizedBox(width: horizontalPadding));
@@ -84,9 +86,9 @@ class PresetRow extends StatelessWidget {
 }
 
 class _Item extends StatelessWidget {
-  final String item;
+  final TaskPreset preset;
 
-  const _Item(this.item);
+  const _Item(this.preset);
 
   @override
   Widget build(BuildContext context) {
@@ -101,7 +103,7 @@ class _Item extends StatelessWidget {
         borderRadius: BorderRadius.circular(4),
       ),
       child: Text(
-        item,
+        preset.name,
         style: theme.textStyle(
           size: 10,
           weight: FontWeight.w400,

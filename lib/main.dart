@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart' hide Theme, Page, Localizations;
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:too_many_tasks/common/coordinator/coordinator.dart';
 import 'package:too_many_tasks/common/services/clock.dart';
+import 'package:too_many_tasks/common/services/shared_preferences.dart';
 import 'package:too_many_tasks/task_list/page.dart' as task_list;
 import 'package:flutter_gen/gen_l10n/strings.dart';
 
 import 'common/services/services.dart';
 import 'common/theme/theme.dart';
+
 void main() {
   runApp(const MainApp());
 }
@@ -24,9 +27,10 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const sharedPreferences = DefaultSharedPreferences();
     return const Services(
       clock: DefaultClock(),
-      // clock: FrozenClock(),
+      sharedPreferences: sharedPreferences,
       child: Theme(
         colors: testColors,
         fontFamily: "",
@@ -40,7 +44,9 @@ class MainApp extends StatelessWidget {
           supportedLocales: [
             Locale('en'),
           ],
-          home: task_list.Page()
+          home: Coordinator(
+            sharedPreferences: sharedPreferences,
+          )
         )
       ),
     );

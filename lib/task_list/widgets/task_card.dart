@@ -14,8 +14,8 @@ const _padding = EdgeInsets.all(14);
 
 abstract interface class Listener {
   void onPinPressed(int index);
-  void onEditPressed();
-  void onCheckmarkPressed();
+  void onEditPressed(int index);
+  void onCheckmarkPressed(int index);
 }
 
 typedef Data = ({int index, Task task, bool pinned});
@@ -133,7 +133,7 @@ class _Title extends StatelessWidget {
         ),
         SizedBox(width: 4 * media.textScaleFactor),
         Text(
-          data.task.title,
+          data.task.name,
           style: theme.textStyle(
             size: 16,
             weight: FontWeight.w400,
@@ -142,7 +142,7 @@ class _Title extends StatelessWidget {
         ),
         SizedBox(width: 4 * media.textScaleFactor),
         GestureDetector(
-          onTap: () => listener.onEditPressed(),
+          onTap: () => listener.onEditPressed(data.index),
           child: Icon(
             Icons.edit_outlined,
             size: 18 * media.textScaleFactor,
@@ -211,7 +211,7 @@ class _CheckMark extends StatelessWidget {
   flutter.Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return GestureDetector(
-      onTap: listener.onCheckmarkPressed,
+      onTap: () => listener.onCheckmarkPressed(data.index),
       child: Container(
         width: _checkboxSize,
         height: _checkboxSize,

@@ -1,6 +1,9 @@
 {
-    "task_dialog_title": "New Task",
+    "task_dialog_new_task_title": "New Task",
+    "task_dialog_edit_task_title": "Edit Task",
     "task_dialog_name_field_title": "Task Name",
     "task_dialog_due_date_field_title": "Due Date",
-    "task_dialog_field_hint": "None"
+    "task_dialog_field_hint": "None",
+    "task_dialog_new_task_add_button": "ADD",
+    "task_dialog_edit_task_confirm_button": "OK"
 }

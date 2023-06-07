@@ -1,5 +1,7 @@
+import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:flutter/material.dart' hide Dialog, Theme, TextButton;
 import 'package:too_many_tasks/common/functions/date_functions.dart';
+import 'package:too_many_tasks/common/models/task.dart';
 import 'package:too_many_tasks/common/theme/theme.dart';
 import 'package:too_many_tasks/common/widgets/button/style.dart';
 import 'package:too_many_tasks/common/widgets/button/text_button.dart';
@@ -14,11 +16,6 @@ import '../dialogs/dialog_scaffold.dart';
 const _fieldPadding = EdgeInsets.symmetric(horizontal: 10, vertical: 8);
 const _spacing = 12.0;
 
-typedef Result = ({
-  String name,
-  DateTime dueDate,
-});
-
 TextStyle _fieldTextStyle(Theme theme) {
   return theme.textStyle(
     size: 10,
@@ -28,7 +25,14 @@ TextStyle _fieldTextStyle(Theme theme) {
 }
 
 class TaskDialog extends StatefulWidget {
-  const TaskDialog({super.key});
+  final Task? task;
+  final IList<TaskPreset> presets;
+
+  const TaskDialog({
+    super.key,
+    required this.task,
+    required this.presets,
+  });
 
   @override
   State<TaskDialog> createState() => _TaskDialogState();
@@ -40,6 +44,14 @@ class _TaskDialogState extends State<TaskDialog> {
   final nameController = TextEditingController();
   final nameFocusNode = FocusNode();
   DateTime? dueDate;
+
+  @override
+  void initState() {
+    super.initState();
+
+    nameController.text = widget.task?.name ?? "";
+    dueDate = widget.task?.dueDate;
+  }
 
   @override
   void dispose() {
@@ -54,7 +66,10 @@ class _TaskDialogState extends State<TaskDialog> {
     final navigator = Navigator.of(context);
     return Dialog(
       child: DialogScaffold(
-        title: strings.task_dialog_title,
+        title: switch (widget.task) {
+          null => strings.task_dialog_new_task_title,
+          _ => strings.task_dialog_edit_task_title,
+        },
         child: AnimatedCrossFade(
           crossFadeState: crossFadeState,
           duration: const Duration(milliseconds: 400),
@@ -70,9 +85,9 @@ class _TaskDialogState extends State<TaskDialog> {
               ),
               const SizedBox(height: _spacing),
               PresetRow(
-                items: ["Brew Coffee", "Hey"].expand((it) => [it, it, it, it]).toList(),
-                onPressed: (item) {
-                  nameController.text = item;
+                presets: widget.presets,
+                onPressed: (preset) {
+                  nameController.text = preset.name;
                   nameFocusNode.unfocus();
                 },
               ),
@@ -89,11 +104,18 @@ class _TaskDialogState extends State<TaskDialog> {
                   horizontal: horizontalPadding
                 ),
                 child: TextButton(
-                  "Add",
+                  switch (widget.task) {
+                    null => strings.task_dialog_new_task_add_button,
+                    _ => strings.task_dialog_edit_task_confirm_button
+                  },
                   style: Style.primary,
                   onPressed: () {
                     navigator.pop(
-                      (name: nameController.text, dueDate: dueDate)
+                      (
+                        title: nameController.text,
+                        dueDate: dueDate,
+                        done: widget.task?.done ?? false,
+                      )
                     );
                   },
                 ),
