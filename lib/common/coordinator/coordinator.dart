@@ -1,6 +1,7 @@
 import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:flutter/material.dart' as flutter;
 import 'package:too_many_tasks/common/coordinator/typedefs.dart';
+import 'package:too_many_tasks/common/functions/error_functions.dart';
 import 'package:too_many_tasks/common/functions/json_functions.dart';
 import 'package:too_many_tasks/common/models/task.dart';
 import 'package:too_many_tasks/common/monads/result.dart';
@@ -42,6 +43,7 @@ class _WidgetState extends flutter.State<Coordinator> {
       taskListSlavePort: taskListSlavePort,
     );
     super.initState();
+    loadPresets();
   }
 
   void loadPresets() async {
@@ -67,8 +69,23 @@ class _WidgetState extends flutter.State<Coordinator> {
     );
   }
 
-  @override
+  void handleTaskListMessage(task_list.SlaveMessage message) {
+    switch (message) {
+      case task_list.AddPreset(preset: final preset):
+        final presets = state.presets;
+        if (presets == null) {
+          badTransition(
+            state,
+            "task_list.AddPreset"
+          );
+        }
+        presets.add(preset);
+        setState(() {});
+    }
+  }
+
   void addPreset(TaskPreset preset) {
+    final state = this.state;
     
   }
 

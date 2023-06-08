@@ -112,7 +112,10 @@ class _State extends State<Page> implements task_card.Listener {
   }
 
   void _onMasterMessage(MasterMessage message) {
-
+    switch (message) {
+      case DataInitialized(data: final data):
+        onDataLoaded(data);
+    }
   }
 
   @override

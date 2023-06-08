@@ -4,6 +4,7 @@ import 'package:too_many_tasks/common/util_classes/channel/ports.dart';
 import 'package:too_many_tasks/task_list/models/message.dart' as task_list;
 
 class State {
+  // TODO: add preset before presets are loaded?
   List<TaskPreset>? presets;
   final TaskListMasterPort taskListMasterPort;
   TaskListSlavePort taskListSlavePort;

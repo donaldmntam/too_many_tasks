@@ -6,7 +6,14 @@ sealed class MasterMessage {}
 
 final class DataInitialized implements MasterMessage {
   final Data data;
+
   const DataInitialized(this.data);
 }
 
 sealed class SlaveMessage {}
+
+final class AddPreset implements SlaveMessage {
+  final TaskPreset preset;
+
+  const AddPreset(this.preset);
+}

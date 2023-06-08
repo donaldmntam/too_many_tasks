@@ -117,6 +117,7 @@ MasterPort<M, S> masterPort<M, S>() {
   final masterChannel = Channel<M>();
   final slaveChannel = Channel<S>();
   final masterPort = MasterPort<M, S>(masterChannel);
+  masterPort._slaveChannel = slaveChannel;
   final slavePort = SlavePort<M, S>(masterChannel, slaveChannel);
   return (masterPort, slavePort);
 }
