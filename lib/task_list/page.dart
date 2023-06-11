@@ -9,7 +9,9 @@ import 'package:too_many_tasks/common/widgets/task_dialog/task_dialog.dart';
 import 'package:too_many_tasks/task_list/controller.dart' as task_list;
 import 'package:too_many_tasks/task_list/models/data.dart';
 import 'package:too_many_tasks/task_list/models/message.dart';
+import 'package:too_many_tasks/task_list/widgets/clip_board.dart';
 import 'package:too_many_tasks/task_list/widgets/task_card.dart' as task_card;
+import 'package:too_many_tasks/task_list/widgets/top.dart';
 import 'state.dart' as page;
 import './widgets/ready_content.dart' as ready;
 import './widgets/loading_content.dart'as loading;
@@ -27,6 +29,9 @@ import './widgets/loading_content.dart'as loading;
 // TODO: loading state
 
 class Page extends StatefulWidget {
+  static const topHeight = 200.0;
+  static const clipBoardBorderRadius = 24.0;
+
   final SlavePort<MasterMessage, SlaveMessage> slavePort;
 
   const Page({
@@ -123,13 +128,28 @@ class _State extends State<Page> implements task_card.Listener {
     final state = this.state;
     return Scaffold(
       body: SafeArea(
-        child: Container(
-          decoration: const BoxDecoration(
-            color: Color(0xFFF5F5F5),
-          ),
-          child: switch (state) {
-            page.Loading() => loading.Content(state: state),
-            page.Ready() => ready.Content(state: state, listener: this),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return Stack(
+              children: [
+                const Align(
+                  alignment: Alignment.topCenter,
+                  child: Top()
+                ),
+                Align(
+                  alignment: Alignment.bottomCenter,
+                  child: ClipBoard(
+                    height: constraints.maxHeight 
+                      - Page.topHeight 
+                      + Page.clipBoardBorderRadius,
+                    child: switch (state) {
+                      page.Loading() => loading.Content(state: state),
+                      page.Ready() => ready.Content(state: state, listener: this),
+                    }
+                  ),
+                ),
+              ],
+            );
           }
         )
       )
