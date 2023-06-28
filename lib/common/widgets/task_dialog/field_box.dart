@@ -28,13 +28,13 @@ class FieldBox extends StatelessWidget {
           style: theme.textStyle(
             size: 10,
             weight: FontWeight.w500,
-            color: theme.colors.onSurface100
+            color: theme.colors.onBackground100
           ),
         ),
         const SizedBox(height: 4),
         Container(
           decoration: BoxDecoration(
-            border: Border.all(color: theme.colors.onSurface100),
+            border: Border.all(color: theme.colors.onBackground100),
             borderRadius: BorderRadius.circular(4),
           ),
           child: Row(
@@ -49,7 +49,7 @@ class FieldBox extends StatelessWidget {
                 height: _iconSize,
                 child: Icon(
                   icon,
-                  color: theme.colors.onSurface100,
+                  color: theme.colors.onBackground100,
                   size: _iconSize - 10,
                 )
               )

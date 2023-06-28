@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:too_many_tasks/common/functions/error_functions.dart';
 import 'package:too_many_tasks/common/functions/scope_functions.dart';
+import 'package:too_many_tasks/common/functions/tasks_functions.dart';
 import 'package:too_many_tasks/common/models/task.dart';
 import 'package:too_many_tasks/common/util_classes/channel/ports.dart';
 import 'package:too_many_tasks/common/widgets/task_dialog/task_dialog.dart';
@@ -11,7 +12,7 @@ import 'package:too_many_tasks/task_list/models/data.dart';
 import 'package:too_many_tasks/task_list/models/message.dart';
 import 'package:too_many_tasks/task_list/widgets/clip_board.dart';
 import 'package:too_many_tasks/task_list/widgets/task_card.dart' as task_card;
-import 'package:too_many_tasks/task_list/widgets/top.dart';
+import 'package:too_many_tasks/task_list/widgets/top/top.dart';
 import 'state.dart' as page;
 import './widgets/ready_content.dart' as ready;
 import './widgets/loading_content.dart'as loading;
@@ -29,8 +30,13 @@ import './widgets/loading_content.dart'as loading;
 // TODO: loading state
 
 class Page extends StatefulWidget {
-  static const topHeight = 200.0;
+  static const topHeight = 150.0;
+  static const clipBoardClipHeight = 60.0;
+  static const clipBoardClipOverlapHeight = 26.0;
   static const clipBoardBorderRadius = 24.0;
+  static const clipBoardOverlapHeight = clipBoardClipHeight
+    - clipBoardClipOverlapHeight
+    + clipBoardBorderRadius;
 
   final SlavePort<MasterMessage, SlaveMessage> slavePort;
 
@@ -54,14 +60,19 @@ class _State extends State<Page> implements task_card.Listener {
 
   @override
   void onCheckmarkPressed(int index) {
-    // setState(() {
-    //   task = (
-    //     title: task.title,
-    //     dueDate: task.dueDate,
-    //     done: !task.done,
-    //     pinned: task.pinned,
-    //   );
-    // });
+    final state = this.state;
+    switch (state) {
+      case page.Ready():
+        final newState = state.copy();
+        final task = newState.tasks[index];
+        newState.tasks[index] = task.copy(
+          done: !task.done
+        );
+        this.state = newState;
+        setState(() {});
+      case page.Loading():
+        badTransition(state, "onCheckmarkPressed");
+    }
   }
   
   @override
@@ -80,6 +91,7 @@ class _State extends State<Page> implements task_card.Listener {
         final newState = state.copy();
         newState.tasks[index] = newTask;
         this.state = newState;
+        setState(() {});
       case page.Loading():
         badTransition(state, "onEditPressed");
     }
@@ -94,13 +106,13 @@ class _State extends State<Page> implements task_card.Listener {
         final taskToPin = newState.tasks.removeAt(index);
         newState.tasks.insert(state.pinnedCount, taskToPin);
         newState.pinnedCount++;
-        setState(() => this.state = newState);
+        this.state = newState;
+        setState(() {});
       case page.Loading():
         badTransition(state, "onPinPressed");
     }
   }
 
-  @override
   void onDataLoaded(Data data) {
     final state = this.state;
     switch (state) {
@@ -132,16 +144,25 @@ class _State extends State<Page> implements task_card.Listener {
           builder: (context, constraints) {
             return Stack(
               children: [
-                const Align(
+                Align(
                   alignment: Alignment.topCenter,
-                  child: Top()
+                  child: SizedBox(
+                    width: double.infinity,
+                    height: Page.topHeight,
+                    child: Top(
+                      progress: switch (state) {
+                        page.Loading() => null,
+                        page.Ready(tasks: final tasks) => tasks.progress,
+                      }
+                    ),
+                  ),
                 ),
                 Align(
                   alignment: Alignment.bottomCenter,
                   child: ClipBoard(
                     height: constraints.maxHeight 
                       - Page.topHeight 
-                      + Page.clipBoardBorderRadius,
+                      + Page.clipBoardOverlapHeight,
                     child: switch (state) {
                       page.Loading() => loading.Content(state: state),
                       page.Ready() => ready.Content(state: state, listener: this),

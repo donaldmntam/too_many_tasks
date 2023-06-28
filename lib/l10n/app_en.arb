@@ -5,5 +5,8 @@
     "task_dialog_due_date_field_title": "Due Date",
     "task_dialog_field_hint": "None",
     "task_dialog_new_task_add_button": "ADD",
-    "task_dialog_edit_task_confirm_button": "OK"
+    "task_dialog_edit_task_confirm_button": "OK",
+
+    "task_list_filter_button": "Filter",
+    "task_list_progress": "Today's Progress"
 }

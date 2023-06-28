@@ -126,8 +126,8 @@ class _Title extends StatelessWidget {
               Icons.push_pin_outlined,
               size: 18 * media.textScaleFactor,
               color: data.pinned
-                ? theme.colors.onSurface400
-                : theme.colors.onSurface100,
+                ? theme.colors.onBackground400
+                : theme.colors.onBackground100,
             ),
           ),
         ),
@@ -137,7 +137,7 @@ class _Title extends StatelessWidget {
           style: theme.textStyle(
             size: 16,
             weight: FontWeight.w400,
-            color: theme.colors.onSurface400,
+            color: theme.colors.onBackground400,
           ),
         ),
         SizedBox(width: 4 * media.textScaleFactor),
@@ -146,7 +146,7 @@ class _Title extends StatelessWidget {
           child: Icon(
             Icons.edit_outlined,
             size: 18 * media.textScaleFactor,
-            color: theme.colors.onSurface400,
+            color: theme.colors.onBackground400,
           ),
         )
       ],
@@ -171,7 +171,7 @@ class _DueDate extends StatelessWidget {
     };
     final textColor = switch (overdue) {
       true => theme.colors.error,
-      false => theme.colors.onSurface400,
+      false => theme.colors.onBackground400,
     };
 
     return IntrinsicHeight(
@@ -180,7 +180,7 @@ class _DueDate extends StatelessWidget {
         children: [
           Icon(
             Icons.schedule,
-            color: theme.colors.onSurface400,
+            color: theme.colors.onBackground400,
             size: 14 * media.textScaleFactor,
           ),
           SizedBox(width: 4 * media.textScaleFactor),

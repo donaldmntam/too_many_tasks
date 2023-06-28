@@ -20,7 +20,7 @@ TextStyle _fieldTextStyle(Theme theme) {
   return theme.textStyle(
     size: 10,
     weight: FontWeight.w400,
-    color: theme.colors.onSurface100,
+    color: theme.colors.onBackground100,
   );
 }
 
@@ -62,7 +62,7 @@ class _TaskDialogState extends State<TaskDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final strings = Strings.of(context)!;
+    final strings = Strings.of(context);
     final navigator = Navigator.of(context);
     return Dialog(
       child: DialogScaffold(
@@ -167,7 +167,7 @@ class _TaskNameField extends StatelessWidget {
             hintText: strings.task_dialog_field_hint, // TODO: translation
             hintStyle: textStyle,
           ),
-          cursorColor: theme.colors.onSurface100,
+          cursorColor: theme.colors.onBackground100,
           cursorWidth: 1,
         ),
       ),          

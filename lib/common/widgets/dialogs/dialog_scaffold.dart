@@ -40,7 +40,7 @@ class DialogScaffold extends StatelessWidget {
                       padding: EdgeInsets.zero,
                       icon: Icon(
                         Icons.close,
-                        color: theme.colors.onSurface400,
+                        color: theme.colors.onBackground400,
                         size: _buttonSize,
                       ),
                     ),
@@ -85,7 +85,7 @@ class _Title extends StatelessWidget {
                 style: theme.textStyle(
                   size: 16,
                   weight: FontWeight.w500,
-                  color: theme.colors.onSurface400,
+                  color: theme.colors.onBackground400,
                 ),
               )
             ]
