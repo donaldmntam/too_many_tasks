@@ -12,7 +12,7 @@ const _startColor = Color(0x10FFFFFF);
 const _endColor = Color(0x30FFFFFF);
 
 class Top extends StatefulWidget {
-  static const progressHeight = Page.topHeight * 0.5;
+  static progressHeight(BuildContext context) => Page.topHeight(context) * 0.5;
 
   final double? progress;
 
@@ -44,30 +44,36 @@ class _TopState extends State<Top> {
           ),
         ),
         Positioned.fill(
-          child: AnimatedOpacity(
-            opacity: widget.progress == null ? 0 : 1,
-            duration: const Duration(seconds: 1),
-            child: Column(
-              children: [
-                Flexible(
-                  fit: FlexFit.tight,
-                  flex: 1,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: Page.clipBoardBorderRadius
-                    ),
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: Progress(widget.progress)
-                    ),
-                  )
-                ),
-                const SizedBox(
-                  height: Page.clipBoardClipHeight
-                    - Page.clipBoardClipOverlapHeight
-                    + Page.clipBoardBorderRadius
-                ),
-              ]
+          child: SafeArea(
+            top: true,
+            left: false,
+            right: false,
+            bottom: false,
+            child: AnimatedOpacity(
+              opacity: widget.progress == null ? 0 : 1,
+              duration: const Duration(seconds: 1),
+              child: Column(
+                children: [
+                  Flexible(
+                    fit: FlexFit.tight,
+                    flex: 1,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: Page.clipBoardBorderRadius
+                      ),
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Progress(widget.progress)
+                      ),
+                    )
+                  ),
+                  const SizedBox(
+                    height: Page.clipBoardClipHeight
+                      - Page.clipBoardClipOverlapHeight
+                      + Page.clipBoardBorderRadius
+                  ),
+                ]
+              ),
             ),
           ),
         ),

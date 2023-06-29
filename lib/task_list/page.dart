@@ -30,7 +30,10 @@ import './widgets/loading_content.dart'as loading;
 // TODO: loading state
 
 class Page extends StatefulWidget {
-  static const topHeight = 150.0;
+  static topHeight(BuildContext context) {
+    final topPadding = MediaQuery.of(context).padding.top;
+    return 150.0 + topPadding;
+  }
   static const clipBoardClipHeight = 60.0;
   static const clipBoardClipOverlapHeight = 26.0;
   static const clipBoardBorderRadius = 24.0;
@@ -140,6 +143,7 @@ class _State extends State<Page> implements task_card.Listener {
     final state = this.state;
     return Scaffold(
       body: SafeArea(
+        top: false,
         child: LayoutBuilder(
           builder: (context, constraints) {
             return Stack(
@@ -148,7 +152,7 @@ class _State extends State<Page> implements task_card.Listener {
                   alignment: Alignment.topCenter,
                   child: SizedBox(
                     width: double.infinity,
-                    height: Page.topHeight,
+                    height: Page.topHeight(context),
                     child: Top(
                       progress: switch (state) {
                         page.Loading() => null,
@@ -161,7 +165,7 @@ class _State extends State<Page> implements task_card.Listener {
                   alignment: Alignment.bottomCenter,
                   child: ClipBoard(
                     height: constraints.maxHeight 
-                      - Page.topHeight 
+                      - Page.topHeight(context) 
                       + Page.clipBoardOverlapHeight,
                     child: switch (state) {
                       page.Loading() => loading.Content(state: state),

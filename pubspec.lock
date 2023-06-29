@@ -101,14 +101,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  funvas:
-    dependency: "direct main"
-    description:
-      name: funvas
-      sha256: "4e2ce96dd138a255ab093a06311fb0a0793ef17719ee1f72bb5aebfd1e746422"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.1.7"
   intl:
     dependency: "direct main"
     description:
