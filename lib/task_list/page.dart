@@ -10,7 +10,8 @@ import 'package:too_many_tasks/common/widgets/task_dialog/task_dialog.dart';
 import 'package:too_many_tasks/task_list/controller.dart' as task_list;
 import 'package:too_many_tasks/task_list/models/data.dart';
 import 'package:too_many_tasks/task_list/models/message.dart';
-import 'package:too_many_tasks/task_list/widgets/clip_board.dart';
+import 'package:too_many_tasks/task_list/widgets/clipboard.dart';
+import 'package:too_many_tasks/task_list/widgets/filter_button.dart';
 import 'package:too_many_tasks/task_list/widgets/task_card.dart' as task_card;
 import 'package:too_many_tasks/task_list/widgets/top/top.dart';
 import 'state.dart' as page;
@@ -34,12 +35,19 @@ class Page extends StatefulWidget {
     final topPadding = MediaQuery.of(context).padding.top;
     return 150.0 + topPadding;
   }
-  static const clipBoardClipHeight = 60.0;
-  static const clipBoardClipOverlapHeight = 26.0;
-  static const clipBoardBorderRadius = 24.0;
-  static const clipBoardOverlapHeight = clipBoardClipHeight
-    - clipBoardClipOverlapHeight
-    + clipBoardBorderRadius;
+  static const clipboardClipHeight = 60.0;
+  static const clipboardClipOverlapHeight = 26.0;
+  static const clipboardClipDanglingHeight = clipboardClipHeight 
+    - clipboardClipOverlapHeight;
+  static const clipboardBorderRadius = 24.0;
+  static const clipboardOverlapHeight = clipboardClipHeight
+    - clipboardClipOverlapHeight
+    + clipboardBorderRadius;
+  static const clipboardTopWidgetsHeight = 36.0;
+  static const clipboardTopClearance = 
+    clipboardClipOverlapHeight > clipboardTopWidgetsHeight
+      ? clipboardOverlapHeight
+      : clipboardTopWidgetsHeight;
 
   final SlavePort<MasterMessage, SlaveMessage> slavePort;
 
@@ -140,43 +148,60 @@ class _State extends State<Page> implements task_card.Listener {
 
   @override
   Widget build(BuildContext context) {
+    final bottomPadding = MediaQuery.of(context).padding.bottom;
+    print("bottom padding: $bottomPadding");
     final state = this.state;
     return Scaffold(
-      body: SafeArea(
-        top: false,
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            return Stack(
-              children: [
-                Align(
-                  alignment: Alignment.topCenter,
-                  child: SizedBox(
-                    width: double.infinity,
-                    height: Page.topHeight(context),
-                    child: Top(
-                      progress: switch (state) {
-                        page.Loading() => null,
-                        page.Ready(tasks: final tasks) => tasks.progress,
-                      }
-                    ),
-                  ),
-                ),
-                Align(
-                  alignment: Alignment.bottomCenter,
-                  child: ClipBoard(
-                    height: constraints.maxHeight 
-                      - Page.topHeight(context) 
-                      + Page.clipBoardOverlapHeight,
-                    child: switch (state) {
-                      page.Loading() => loading.Content(state: state),
-                      page.Ready() => ready.Content(state: state, listener: this),
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          return Stack(
+            children: [
+              Align(
+                alignment: Alignment.topCenter,
+                child: SizedBox(
+                  width: double.infinity,
+                  height: Page.topHeight(context),
+                  child: Top(
+                    progress: switch (state) {
+                      page.Loading() => null,
+                      page.Ready(tasks: final tasks) => tasks.progress,
                     }
                   ),
                 ),
-              ],
-            );
-          }
-        )
+              ),
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: Clipboard(
+                  height: constraints.maxHeight 
+                    - Page.topHeight(context) 
+                    + Page.clipboardOverlapHeight,
+                  topRightChild: switch (state) {
+                    page.Loading() => null,
+                    page.Ready() => Padding(
+                      padding: const EdgeInsets.only(
+                        top: 12,
+                        left: Page.clipboardBorderRadius,
+                        right: Page.clipboardBorderRadius,
+                      ),
+                      child: FittedBox(
+                        fit: BoxFit.contain,
+                        alignment: Alignment.centerRight,
+                        child: FilterButton()
+                      )
+                    ),
+                  },
+                  child: switch (state) {
+                    page.Loading() => loading.Content(state: state),
+                    page.Ready() => ready.Content(
+                      state: state,
+                      listener: this
+                    ),
+                  }
+                ),
+              ),
+            ],
+          );
+        }
       )
     );
   }

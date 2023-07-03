@@ -59,7 +59,7 @@ class _TopState extends State<Top> {
                     flex: 1,
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: Page.clipBoardBorderRadius
+                        horizontal: Page.clipboardBorderRadius
                       ),
                       child: Align(
                         alignment: Alignment.centerLeft,
@@ -68,9 +68,9 @@ class _TopState extends State<Top> {
                     )
                   ),
                   const SizedBox(
-                    height: Page.clipBoardClipHeight
-                      - Page.clipBoardClipOverlapHeight
-                      + Page.clipBoardBorderRadius
+                    height: Page.clipboardClipHeight
+                      - Page.clipboardClipOverlapHeight
+                      + Page.clipboardBorderRadius
                   ),
                 ]
               ),

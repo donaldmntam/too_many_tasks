@@ -41,13 +41,14 @@ class Theme extends InheritedWidget {
   }
 
   BoxShadow boxShadow({
+    int alpha = 16,
     BlurStyle blurStyle = BlurStyle.normal,
   }) {
     return BoxShadow(
-      color: const Color(0x10000000),
+      color: Color.fromARGB(alpha, 0, 0, 0),
       blurRadius: 4,
       spreadRadius: 0, 
-      offset: const Offset(0, 4),
+      offset: const Offset(0, 2),
       blurStyle: blurStyle,
     );
   }

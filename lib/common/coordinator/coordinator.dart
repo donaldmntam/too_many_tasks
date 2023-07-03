@@ -58,7 +58,26 @@ class _WidgetState extends flutter.State<Coordinator> {
             (name: "Preset1")
           ].lock,
           tasks: [
-            (name: "Task 1", dueDate: DateTime.now(), done: false)
+            (name: "Task 1", dueDate: DateTime.now(), done: false),
+            (name: "Task 1", dueDate: DateTime.now(), done: false),
+            (name: "Task 1", dueDate: DateTime.now(), done: false),
+            (name: "Task 1", dueDate: DateTime.now(), done: false),
+            (name: "Task 1", dueDate: DateTime.now(), done: false),
+            (name: "Task 1", dueDate: DateTime.now(), done: false),
+            (name: "Task 1", dueDate: DateTime.now(), done: false),
+            (name: "Task 1", dueDate: DateTime.now(), done: false),
+            (name: "Task 1", dueDate: DateTime.now(), done: false),
+            (name: "Task 1", dueDate: DateTime.now(), done: false),
+            (name: "Task 1", dueDate: DateTime.now(), done: false),
+            (name: "Task 1", dueDate: DateTime.now(), done: false),
+            (name: "Task 1", dueDate: DateTime.now(), done: false),
+            (name: "Task 1", dueDate: DateTime.now(), done: false),
+            (name: "Task 1", dueDate: DateTime.now(), done: false),
+            (name: "Task 1", dueDate: DateTime.now(), done: false),
+            (name: "Task 1", dueDate: DateTime.now(), done: false),
+            (name: "Task 1", dueDate: DateTime.now(), done: false),
+            (name: "Task 1", dueDate: DateTime.now(), done: false),
+            (name: "Task 1", dueDate: DateTime.now(), done: false),
           ].lock,
         )
       )
