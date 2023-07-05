@@ -62,9 +62,9 @@ class _State extends widgets.State<Swipeable>
         );
         this.state = newState;
         setState(() {});
-      case Released():
+      case Released(initialOffset: final initialOffset):
         final newState = Dragging(
-          details.localPosition.dx,
+          initialOffset,
           details.localPosition.dx
         );
         this.state = newState;
