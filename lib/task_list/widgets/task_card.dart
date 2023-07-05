@@ -3,9 +3,12 @@ import 'dart:math';
 import 'package:flutter/material.dart' hide Theme, Widget;
 import 'package:flutter/widgets.dart' as flutter show Widget;
 import 'package:too_many_tasks/common/functions/date_functions.dart';
+import 'package:too_many_tasks/common/functions/scope_functions.dart';
 import 'package:too_many_tasks/common/models/task.dart';
 import 'package:too_many_tasks/common/services/services.dart';
 import 'package:too_many_tasks/common/theme/theme.dart';
+import 'package:too_many_tasks/common/widgets/swipeable/details.dart';
+import 'package:too_many_tasks/common/widgets/swipeable/swipeable.dart';
 
 const _headerWidth = 32.0;
 const _checkboxSize = 42.0;
@@ -32,7 +35,7 @@ class Widget extends StatelessWidget {
 
   @override
   flutter.Widget build(BuildContext context) {
-    return _Background(
+    return _Background(        
       child: Padding(
         padding: _padding,
         child: Row(
@@ -62,20 +65,29 @@ class _Background extends StatelessWidget {
       child: Container(
         clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
-          color: theme.colors.surface,
           borderRadius: _borderRadius,
           boxShadow: [theme.boxShadow()],
         ),
-        child: Row(
-          children: [
-            Container(
-              color: theme.colors.secondary,
-              height: double.infinity,
-              width: _headerWidth,
+        child: Swipeable(
+          leftBackgroundBuilder: _SwipeableBackground.new,
+          child: Container(
+            clipBehavior: Clip.antiAlias,
+            decoration: BoxDecoration(
+              color: theme.colors.surface,
+              boxShadow: [theme.boxShadow()],
             ),
-            Flexible(flex: 1, child: child),
-          ]
-        )
+            child: Row(
+              children: [
+                Container(
+                  color: theme.colors.secondary,
+                  height: double.infinity,
+                  width: _headerWidth,
+                ),
+                Flexible(flex: 1, child: child),
+              ]
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -237,6 +249,30 @@ class _CheckMark extends StatelessWidget {
           ),
         )
       ),
+    );
+  }
+}
+
+class _SwipeableBackground extends StatelessWidget {
+  final BackgroundBuilderDetails details;
+
+  const _SwipeableBackground(this.details);
+
+  @override
+  flutter.Widget build(BuildContext context) {
+    return Container(
+      color: switch (details) {
+        DraggingBackgroundBuilderDetails(
+          relativeOffset: final relativeOffset,
+        ) => Color.fromARGB((255 * relativeOffset).toInt(), 0, 0, 0),
+        ReleasedBackgroundBuilderDetails(
+          thresholdReached: final thresholdReached,
+        ) => thresholdReached ? Colors.green : Colors.red,
+      },
+      child: const Icon(
+        Icons.abc,
+        color: Colors.black,
+      )
     );
   }
 }

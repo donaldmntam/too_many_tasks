@@ -21,20 +21,20 @@ class Content extends StatefulWidget {
 
 class _ContentState extends widgets.State<Content> {
   late final ScrollController controller;
-  var showsScrollLine = false;
+  var hasScrolledDown = false;
 
   @override
   void initState() {
     controller = ScrollController();
     controller.addListener(() {
-      final shouldShowLine = controller.offset > 0 && showsScrollLine == false;
-      if (shouldShowLine) {
-        setState(() => showsScrollLine = true);
+      final justScrolledDown = controller.offset > 0 && hasScrolledDown == false;
+      if (justScrolledDown) {
+        setState(() => hasScrolledDown = true);
         return;
       }
-      final shouldHideLine = controller.offset <= 0 && showsScrollLine == true;
-      if (shouldHideLine) {
-        setState(() => showsScrollLine = false);
+      final justReachedTop = controller.offset <= 0 && hasScrolledDown == true;
+      if (justReachedTop) {
+        setState(() => hasScrolledDown = false);
         return;
       }
     });
@@ -51,6 +51,27 @@ class _ContentState extends widgets.State<Content> {
 
   @override
   Widget build(BuildContext context) {
+    // return Center(
+    //   child: SizedBox(
+    //     width: 100,
+    //     height: 100,
+    //     child: Stack(
+    //       children: [
+    //         Container(
+    //           width: 50,
+    //           height: 100,
+    //           color: Colors.red,
+    //         ),
+    //         Container(
+    //           width: 100,
+    //           height: 100,
+    //           color: Colors.white
+    //         )
+    //       ]
+    //     ),
+    //   ),
+    // );
+
     final theme = Theme.of(context);
     final bottomPadding = MediaQuery.of(context).padding.bottom;
     return MediaQuery.removePadding(
@@ -61,7 +82,7 @@ class _ContentState extends widgets.State<Content> {
           Column(
             children: [
               AnimatedOpacity(
-                opacity: showsScrollLine ? 1.0 : 0.0,
+                opacity: hasScrolledDown ? 1.0 : 0.0,
                 duration: _animationDuration,
                 child: Divider(
                   height: 1,
@@ -112,7 +133,7 @@ class _ContentState extends widgets.State<Content> {
               padding: const EdgeInsets.all(_returnButtonPadding),
               child: AnimatedOpacity(
                 duration: _animationDuration,
-                opacity: showsScrollLine ? 1.0 : 0.0,
+                opacity: hasScrolledDown ? 1.0 : 0.0,
                 child: GestureDetector(
                   onTap: () => controller.animateTo(
                     0,
