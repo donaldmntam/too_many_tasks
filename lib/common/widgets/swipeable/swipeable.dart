@@ -179,8 +179,8 @@ class _State extends widgets.State<Swipeable>
                     ReleasedBackgroundBuilderDetails(
                       relativeOffset: (currentOffset - initialOffset)
                         / widget.threshold,
-                      thresholdReached: (releasedOffset - initialOffset).also((it) {print("r: $it");})
-                        == widget.threshold.also((it) {print("t: $it");}),
+                      thresholdReached: (releasedOffset - initialOffset)
+                        == widget.threshold,
                     )
                   )
                 }

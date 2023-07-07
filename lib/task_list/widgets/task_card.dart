@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart' hide Theme, Widget;
 import 'package:flutter/widgets.dart' as flutter show Widget;
+import 'package:lottie/lottie.dart';
 import 'package:too_many_tasks/common/functions/date_functions.dart';
 import 'package:too_many_tasks/common/functions/scope_functions.dart';
 import 'package:too_many_tasks/common/models/task.dart';
@@ -10,15 +11,16 @@ import 'package:too_many_tasks/common/theme/theme.dart';
 import 'package:too_many_tasks/common/widgets/swipeable/details.dart';
 import 'package:too_many_tasks/common/widgets/swipeable/swipeable.dart';
 
+import 'check_mark/check_mark.dart';
+
 const _headerWidth = 32.0;
-const _checkboxSize = 42.0;
 final _borderRadius = BorderRadius.circular(12);
 const _padding = EdgeInsets.all(14);
 
 abstract interface class Listener {
   void onPinPressed(int index);
   void onEditPressed(int index);
-  void onCheckmarkPressed(int index);
+  void onCheckMarkPressed(int index);
 }
 
 typedef Data = ({int index, Task task, bool pinned});
@@ -45,7 +47,7 @@ class Widget extends StatelessWidget {
               fit: FlexFit.tight,
               child: _Body(data, listener),
             ),
-            _CheckMark(data, listener),
+            CheckMark(data, listener),
           ]
         ),
       )
@@ -205,49 +207,6 @@ class _DueDate extends StatelessWidget {
             )
           ),
         ]
-      ),
-    );
-  }
-}
-
-class _CheckMark extends StatelessWidget {
-  final Data data;
-  final Listener listener;
-
-  const _CheckMark(
-    this.data,
-    this.listener,
-  );
-
-  @override
-  flutter.Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return GestureDetector(
-      onTap: () => listener.onCheckmarkPressed(data.index),
-      child: Container(
-        width: _checkboxSize,
-        height: _checkboxSize,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: theme.colors.secondary,
-        ),
-        child: data.task.done ? Center(
-          child: Icon( // TODO: use figma's
-            Icons.check,
-            color: theme.colors.onSecondary,
-            size: _checkboxSize - 12,
-          ),
-        ) : Padding(
-          padding: const EdgeInsets.all(6),
-          child: Container(
-            width: double.infinity,
-            height: double.infinity,
-            decoration: BoxDecoration( 
-              shape: BoxShape.circle,
-              color: theme.colors.surface,
-            )
-          ),
-        )
       ),
     );
   }

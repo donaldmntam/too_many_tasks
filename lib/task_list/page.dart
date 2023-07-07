@@ -8,6 +8,7 @@ import 'package:too_many_tasks/common/models/task.dart';
 import 'package:too_many_tasks/common/util_classes/channel/ports.dart';
 import 'package:too_many_tasks/common/widgets/task_dialog/task_dialog.dart';
 import 'package:too_many_tasks/task_list/controller.dart' as task_list;
+import 'package:too_many_tasks/task_list/functions/task_functions.dart';
 import 'package:too_many_tasks/task_list/models/data.dart';
 import 'package:too_many_tasks/task_list/models/message.dart';
 import 'package:too_many_tasks/task_list/widgets/clipboard.dart';
@@ -70,7 +71,7 @@ class _State extends State<Page> implements task_card.Listener {
   }
 
   @override
-  void onCheckmarkPressed(int index) {
+  void onCheckMarkPressed(int index) {
     final state = this.state;
     switch (state) {
       case page.Ready():
@@ -115,10 +116,17 @@ class _State extends State<Page> implements task_card.Listener {
       case page.Ready():
         final newState = state.copy();
         final taskToPin = newState.tasks.removeAt(index);
-        newState.tasks.insert(state.pinnedCount, taskToPin);
-        newState.pinnedCount++;
-        this.state = newState;
-        setState(() {});
+        if (taskIsPinned(index: index, pinnedCount: state.pinnedCount)) {
+          newState.tasks.add(taskToPin);
+          newState.pinnedCount--;
+          this.state = newState;
+          setState(() {});
+        } else {
+          newState.tasks.insert(state.pinnedCount, taskToPin);
+          newState.pinnedCount++;
+          this.state = newState;
+          setState(() {});
+        }
       case page.Loading():
         badTransition(state, "onPinPressed");
     }
@@ -148,8 +156,6 @@ class _State extends State<Page> implements task_card.Listener {
 
   @override
   Widget build(BuildContext context) {
-    final bottomPadding = MediaQuery.of(context).padding.bottom;
-    print("bottom padding: $bottomPadding");
     final state = this.state;
     return Scaffold(
       body: LayoutBuilder(
