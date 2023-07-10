@@ -8,3 +8,7 @@ extension ExtendedObject<T> on T {
     return block(this);
   }
 }
+
+R run<R>(R Function() block) {
+  return block();
+}

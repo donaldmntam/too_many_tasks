@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart' hide State, Theme;
+import 'package:too_many_tasks/common/functions/list_functions.dart';
+import 'package:too_many_tasks/common/models/task.dart';
 import 'package:too_many_tasks/common/theme/theme.dart';
 import 'package:too_many_tasks/task_list/state.dart';
 import 'task_card.dart' as task_card;
@@ -10,10 +12,16 @@ const _returnButtonPadding = 16.0;
 const _animationDuration = Duration(milliseconds: 200);
 
 class Content extends StatefulWidget {
+  final double fabClearance;
   final Ready state;
   final task_card.Listener listener;
 
-  const Content({super.key, required this.state, required this.listener});
+  const Content({
+    super.key,
+    required this.fabClearance,
+    required this.state,
+    required this.listener
+  });
 
   @override
   widgets.State<Content> createState() => _ContentState();
@@ -51,29 +59,8 @@ class _ContentState extends widgets.State<Content> {
 
   @override
   Widget build(BuildContext context) {
-    // return Center(
-    //   child: SizedBox(
-    //     width: 100,
-    //     height: 100,
-    //     child: Stack(
-    //       children: [
-    //         Container(
-    //           width: 50,
-    //           height: 100,
-    //           color: Colors.red,
-    //         ),
-    //         Container(
-    //           width: 100,
-    //           height: 100,
-    //           color: Colors.white
-    //         )
-    //       ]
-    //     ),
-    //   ),
-    // );
-
     final theme = Theme.of(context);
-    final bottomPadding = MediaQuery.of(context).padding.bottom;
+    final bottomInset = MediaQuery.of(context).padding.bottom;
     return MediaQuery.removePadding(
       context: context,
       removeTop: true,
@@ -93,36 +80,12 @@ class _ContentState extends widgets.State<Content> {
               ),
               Flexible(
                 flex: 1,
-                child: ListView.separated(
-                  physics: const BouncingScrollPhysics(),
-                  controller: controller,
-                  itemCount: widget.state.tasks.length + 1, // plus one for bottom inset
-                  itemBuilder: (context, index) { 
-                    if (index == widget.state.tasks.length) {
-                      return SizedBox(height: bottomPadding);
-                    }
-                    final bool pinned = index <= widget.state.pinnedCount - 1;
-                    return Padding(
-                      padding: _padding(widget.state.tasks.length, index),
-                      child: task_card.Widget(
-                        (index: index, task: widget.state.tasks[index], pinned: pinned),
-                        widget.listener,
-                      ),
-                    );
-                  },
-                  separatorBuilder: (context, index) {
-                    if (index == widget.state.pinnedCount - 1) {
-                      return const SizedBox(
-                        height: 16,
-                        child: Divider(
-                          height: 1,
-                          color: Color(0xFFA4A2A0)
-                        )
-                      );
-                    } else {
-                      return const SizedBox(height: 8);
-                    }
-                  },
+                child: _listView(
+                  tasks: widget.state.tasks,
+                  pinnedCount: widget.state.pinnedCount,
+                  bottomPadding: bottomInset + widget.fabClearance, 
+                  listener: widget.listener,
+                  scrollController: controller
                 ),
               ),
             ],
@@ -165,6 +128,65 @@ class _ContentState extends widgets.State<Content> {
       ),
     );
   }
+}
+
+Widget _listView({
+  required List<Task> tasks,
+  required int pinnedCount,
+  required double bottomPadding,
+  required task_card.Listener listener,
+  required ScrollController scrollController,
+}) {
+  final widgetBuilders = List<Widget Function()>.generate(
+    tasks.length,
+    (index) => () {
+      final task = tasks[index];
+      final bool pinned = index <= pinnedCount - 1;
+      return Padding(
+        padding: _padding(tasks.length, index),
+        child: task_card.Widget(
+          (index: index, task: task, pinned: pinned),
+          listener,
+        ),
+      );
+    }
+  );
+  widgetBuilders.insertInBetween((index) {
+    if (index == pinnedCount - 1) {
+      return () => const SizedBox(
+        height: 16,
+        child: Divider(
+          height: 1,
+          color: Color(0xFFA4A2A0)
+        )
+      );
+    } else {
+      return () => const SizedBox(height: 8);
+    }
+  });
+  widgetBuilders.add(
+    () => SizedBox(height: bottomPadding),
+  );
+
+  return ListView.builder(
+    physics: const BouncingScrollPhysics(),
+    controller: scrollController,
+    itemCount: widgetBuilders.length,
+    itemBuilder: (_, index) => widgetBuilders[index](),
+    // separatorBuilder: (context, index) {
+    //   if (index == widget.state.pinnedCount - 1) {
+    //     return const SizedBox(
+    //       height: 16,
+    //       child: Divider(
+    //         height: 1,
+    //         color: Color(0xFFA4A2A0)
+    //       )
+    //     );
+    //   } else {
+    //     return const SizedBox(height: 8);
+    //   }
+    // },
+  );
 }
 
 EdgeInsets _padding(int length, int index) {

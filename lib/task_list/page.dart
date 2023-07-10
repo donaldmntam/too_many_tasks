@@ -31,6 +31,10 @@ import './widgets/loading_content.dart'as loading;
 // TODO: animation when task is updated
 // TODO: loading state
 
+const _fabPadding = EdgeInsets.all(12);
+const _fabSize = 54.0;
+const _fabInnerPadding = 12.0;
+
 class Page extends StatefulWidget {
   static topHeight(BuildContext context) {
     final topPadding = MediaQuery.of(context).padding.top;
@@ -200,11 +204,28 @@ class _State extends State<Page> implements task_card.Listener {
                     page.Loading() => loading.Content(state: state),
                     page.Ready() => ready.Content(
                       state: state,
-                      listener: this
+                      listener: this,
+                      fabClearance: _fabSize + _fabPadding.bottom,
                     ),
                   }
                 ),
               ),
+              Align(
+                alignment: Alignment.bottomRight,
+                child: Padding(
+                  padding: _fabPadding,
+                  child: SizedBox.square(
+                    dimension: _fabSize,
+                    child: FloatingActionButton(
+                      child: const Icon(
+                        Icons.add,
+                        size: _fabSize - _fabInnerPadding
+                      ),
+                      onPressed: () { print("suh dudes!"); },
+                    )
+                  ),
+                )
+              )
             ],
           );
         }

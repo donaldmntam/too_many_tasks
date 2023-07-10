@@ -22,6 +22,7 @@ class FrozenClock implements Clock {
   }
 }
 
+// TODO: make sure to load all assets first
 class MainApp extends StatelessWidget {
   const MainApp({super.key});
 

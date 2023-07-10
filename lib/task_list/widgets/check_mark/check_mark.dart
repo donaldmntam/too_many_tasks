@@ -21,22 +21,22 @@ class CheckMark extends StatefulWidget {
 }
 
 class _CheckMarkState extends State<CheckMark> with TickerProviderStateMixin {
-  late bool checked;
-
   late final AnimationController controller;
 
   @override
   void initState() {
     final done = widget.data.task.done;
-    checked = done;
 
-    controller = AnimationController(vsync: this);
-    controller.duration = const Duration(milliseconds: 1000);    
+    controller = AnimationController(
+      vsync: this,
+      upperBound: 0.6,
+    );
+    controller.duration = const Duration(milliseconds: 1000);
 
     if (done) {
-      controller.forward();
-    } else {
       controller.value = controller.upperBound;
+    } else {
+      controller.value = controller.lowerBound;
     }
 
     super.initState();
@@ -51,16 +51,13 @@ class _CheckMarkState extends State<CheckMark> with TickerProviderStateMixin {
 
   @override
   void didUpdateWidget(CheckMark oldWidget) {
-    final done = widget.data.task.done;
-    if (checked != done) {
-      setState(() {
-        checked = done;
-        if (done) {
-          controller.forward();
-        } else {
-          controller.reset();
-        }
-      });
+    final newDone = widget.data.task.done;
+    if (newDone != oldWidget.data.task.done) {
+      if (newDone) {
+        controller.forward();
+      } else {
+        controller.reverse();
+      }
     }
 
     super.didUpdateWidget(oldWidget);
@@ -71,20 +68,20 @@ class _CheckMarkState extends State<CheckMark> with TickerProviderStateMixin {
     final theme = Theme.of(context);
     return GestureDetector(
       onTap: () => widget.listener.onCheckMarkPressed(widget.data.index),
-      child: Container(
+      child: SizedBox(
         width: _checkboxSize,
         height: _checkboxSize,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: theme.colors.secondary,
-        ),
-        child: checked ? Center(
+        // decoration: BoxDecoration(
+        //   shape: BoxShape.circle,
+        //   color: theme.colors.secondary,
+        // ),
+        child: widget.data.task.done || true ? Center(
           child: Lottie.asset(          
-          'assets/lottie/task_card_check_mark_check.json',
-          controller: controller,
-          width: _checkboxSize,
-          height: _checkboxSize,
-        )
+            'assets/lottie/task_card_check_mark_check.json',
+            controller: controller,
+            width: _checkboxSize,
+            height: _checkboxSize,
+          )
         ) : Padding(
           padding: const EdgeInsets.all(6),
           child: Container(
