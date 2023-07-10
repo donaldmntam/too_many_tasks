@@ -2,9 +2,10 @@ import 'package:flutter/material.dart' hide Theme;
 import 'package:flutter_gen/gen_l10n/strings.dart';
 import 'package:too_many_tasks/common/theme/theme.dart';
 
+import 'bar.dart';
+
 const _barHeight = 10.0;
 const _percentageHeight = 18.0;
-const _barFillColor = Color(0x70FFFFFF);
 
 class Progress extends StatelessWidget {
   final double? progress;
@@ -44,7 +45,7 @@ class Progress extends StatelessWidget {
                 flex: 1,
                 child: SizedBox(
                   height: _barHeight,
-                  child: _Bar(progress ?? 0)
+                  child: Bar(progress ?? 0)
                 )
               ),
               const SizedBox(width: 4),
@@ -59,35 +60,6 @@ class Progress extends StatelessWidget {
           )
         ),
       ]
-    );
-  }
-}
-
-class _Bar extends StatelessWidget {
-  final double progress;
-
-  const _Bar(this.progress);
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Container(
-      decoration: ShapeDecoration(
-        color: theme.colors.primary,
-        shape: StadiumBorder(
-          side: BorderSide(color: theme.colors.onPrimary)
-        ),
-      ),
-      child: LayoutBuilder(
-        builder: (_, constraints) => Row(
-          children: [
-            Container(
-              width: constraints.maxWidth * progress,
-              color: _barFillColor,
-            ),
-          ]
-        ),
-      ),
     );
   }
 }

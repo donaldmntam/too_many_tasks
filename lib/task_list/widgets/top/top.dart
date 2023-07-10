@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart' hide Page, Theme;
 import 'package:too_many_tasks/common/theme/theme.dart';
 import 'package:too_many_tasks/task_list/page.dart';
-import 'package:too_many_tasks/task_list/widgets/top/progress.dart';
+import 'package:too_many_tasks/task_list/widgets/top/progress/progress.dart';
 import 'package:too_many_tasks/task_list/widgets/top/rising_bubbles.dart';
 
 const _gridSize = 26.0;
