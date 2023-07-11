@@ -222,7 +222,7 @@ class _SwipeableBackground extends StatelessWidget {
     return Container(
       color: switch (details) {
         DraggingBackgroundBuilderDetails(
-          relativeOffset: final relativeOffset,
+          animationValue: final relativeOffset,
         ) => Color.fromARGB((255 * relativeOffset).toInt(), 0, 0, 0),
         ReleasedBackgroundBuilderDetails(
           thresholdReached: final thresholdReached,

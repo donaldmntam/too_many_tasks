@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
@@ -13,8 +14,10 @@ final class Dragging implements State {
   final double initialOffset;
   final double currentOffset;
 
-  double relativeOffset(double threshold) => (threshold - currentOffset) 
-    / (threshold - initialOffset);
+  double relativeOffset(double swipeDistance) =>
+    (currentOffset - initialOffset) / swipeDistance;
+  double animationValue(double swipeThreshold) =>
+    min(1.0, (currentOffset - initialOffset) / swipeThreshold);
 
   const Dragging(this.initialOffset, this.currentOffset);
 }
@@ -24,9 +27,12 @@ final class Released implements State {
   final double currentOffset;
   final double releasedOffset;
 
-  double relativeOffset(double threshold) => (threshold - currentOffset) 
-    / (threshold - initialOffset);
-  bool thresholdReached(double threshold) => releasedOffset >= threshold;
+  double relativeOffset(double swipeDistance) => 
+    (currentOffset - initialOffset) / swipeDistance;
+  double animationValue(double swipeThreshold) =>
+    min(1.0, (currentOffset - initialOffset) / swipeThreshold);
+  bool thresholdReached(double swipeThreshold) => 
+    releasedOffset - initialOffset >= swipeThreshold;
 
   const Released(
     this.initialOffset,

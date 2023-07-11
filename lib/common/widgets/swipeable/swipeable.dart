@@ -14,7 +14,8 @@ typedef WidgetBuilder = Widget Function(BackgroundBuilderDetails details);
 class Swipeable extends StatefulWidget {
   final Duration duration;
   final Curve curve;
-  final double threshold;
+  final double swipeDistance;
+  final double swipeThreshold;
   final WidgetBuilder leftBackgroundBuilder;
   final Widget child;
 
@@ -22,7 +23,8 @@ class Swipeable extends StatefulWidget {
     super.key,
     this.duration = const Duration(milliseconds: 500),
     this.curve = Curves.easeOut,
-    this.threshold = 80.0,
+    this.swipeThreshold = 75.0,
+    this.swipeDistance = 80.0,
     required this.leftBackgroundBuilder,
     required this.child,
   });
@@ -82,7 +84,7 @@ class _State extends widgets.State<Swipeable>
         final currentOffset = clampDouble(
           details.localPosition.dx,
           0, // initialOffset - widget.threshold,
-          initialOffset + widget.threshold,
+          initialOffset + widget.swipeDistance,
         );
         final newState = Dragging(initialOffset, currentOffset);
         this.state = newState;
@@ -148,6 +150,7 @@ class _State extends widgets.State<Swipeable>
 
   @override
   Widget build(BuildContext context) {
+    final state = this.state;
     return GestureDetector(
       onHorizontalDragStart: onDragStart,
       onHorizontalDragUpdate: onDragUpdate,
@@ -162,25 +165,17 @@ class _State extends widgets.State<Swipeable>
                 height: double.infinity,
                 child: switch (state) {
                   Idling() => null,
-                  Dragging(
-                    initialOffset: final initialOffset,
-                    currentOffset: final currentOffset,
-                  ) => widget.leftBackgroundBuilder(
+                  Dragging() => widget.leftBackgroundBuilder(
                     DraggingBackgroundBuilderDetails(
-                      relativeOffset: (currentOffset - initialOffset) 
-                        / widget.threshold
+                      animationValue: state.animationValue(widget.swipeThreshold)
                     ),
                   ),
-                  Released(
-                    initialOffset: final initialOffset,
-                    currentOffset: final currentOffset,
-                    releasedOffset: final releasedOffset
-                  ) => widget.leftBackgroundBuilder(
+                  Released() => widget.leftBackgroundBuilder(
                     ReleasedBackgroundBuilderDetails(
-                      relativeOffset: (currentOffset - initialOffset)
-                        / widget.threshold,
-                      thresholdReached: (releasedOffset - initialOffset)
-                        == widget.threshold,
+                      animationValue: state.animationValue(widget.swipeThreshold),
+                      thresholdReached: state.thresholdReached(
+                        widget.swipeThreshold
+                      ),
                     )
                   )
                 }
