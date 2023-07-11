@@ -19,19 +19,10 @@ import 'state.dart' as page;
 import './widgets/ready_content.dart' as ready;
 import './widgets/loading_content.dart'as loading;
 
-//  = List.generate(
-//     10,
-//     (index) => (
-//       name: "Task ${index + 1}",
-//       dueDate: DateTime(2023, 5, 10 + index),
-//       done: true,
-//     ),
-//   ).lock;
-
 // TODO: animation when task is updated
 // TODO: loading state
 
-const _fabPadding = EdgeInsets.all(12);
+const _fabPadding = EdgeInsets.symmetric(horizontal: 24, vertical: 36);
 const _fabSize = 54.0;
 const _fabInnerPadding = 12.0;
 
@@ -54,9 +45,10 @@ class Page extends StatefulWidget {
       ? clipboardOverlapHeight
       : clipboardTopWidgetsHeight;
 
+  final listKey = GlobalKey<AnimatedListState>();
   final SlavePort<MasterMessage, SlaveMessage> slavePort;
 
-  const Page({
+  Page({
     super.key,
     required this.slavePort,
   });
@@ -136,6 +128,31 @@ class _State extends State<Page> implements task_card.Listener {
     }
   }
 
+  @override
+  void onRemove(int index) {
+    print("currentState ${widget.listKey.currentState}");
+    widget.listKey.currentState?.removeItem(
+      index,
+      (context, animation) => Container(
+        color: Colors.red.withAlpha((255 * animation.value).toInt())
+      )
+    );
+    // final state = this.state;
+    // switch (state) {
+    //   case page.Ready():
+    //     final newState = state.copy();
+    //     if (taskIsPinned(index: index, pinnedCount: state.pinnedCount)) {
+    //       newState.pinnedCount--;
+    //     }
+    //     print("removing at $index from list of length ${newState.tasks.length}");
+    //     newState.tasks.removeAt(index);
+    //     this.state = newState;
+    //     setState(() {});
+    //   case page.Loading():
+    //     badTransition(state, "onRemove");
+    // }
+  }
+
   void onDataLoaded(Data data) {
     final state = this.state;
     switch (state) {
@@ -203,6 +220,7 @@ class _State extends State<Page> implements task_card.Listener {
                   child: switch (state) {
                     page.Loading() => loading.Content(state: state),
                     page.Ready() => ready.Content(
+                      listKey: widget.listKey,
                       state: state,
                       listener: this,
                       fabClearance: _fabSize + _fabPadding.bottom,

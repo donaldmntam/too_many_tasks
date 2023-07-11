@@ -1,7 +1,6 @@
 import 'dart:math';
 
-import 'package:flutter/material.dart' hide Theme, Widget;
-import 'package:flutter/widgets.dart' as flutter show Widget;
+import 'package:flutter/material.dart' hide Theme;
 import 'package:lottie/lottie.dart';
 import 'package:too_many_tasks/common/functions/date_functions.dart';
 import 'package:too_many_tasks/common/functions/scope_functions.dart';
@@ -21,23 +20,26 @@ abstract interface class Listener {
   void onPinPressed(int index);
   void onEditPressed(int index);
   void onCheckMarkPressed(int index);
+  void onRemove(int index);
 }
 
 typedef Data = ({int index, Task task, bool pinned});
 
-class Widget extends StatelessWidget {
+class TaskCard extends StatelessWidget {
   final Data data;
   final Listener listener;
 
-  const Widget(
+  const TaskCard(
     this.data,
     this.listener,
     {super.key}
   );
 
   @override
-  flutter.Widget build(BuildContext context) {
+  Widget build(BuildContext context) {
     return _Background(        
+      data: data,
+      listener: listener,
       child: Padding(
         padding: _padding,
         child: Row(
@@ -56,12 +58,18 @@ class Widget extends StatelessWidget {
 }
 
 class _Background extends StatelessWidget {
-  final flutter.Widget child;
+  final Data data;
+  final Listener listener;
+  final Widget child;
 
-  const _Background({required this.child});
+  const _Background({
+    required this.data,
+    required this.listener,
+    required this.child
+  });
 
   @override
-  flutter.Widget build(BuildContext context) {
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return IntrinsicHeight(
       child: Container(
@@ -72,6 +80,7 @@ class _Background extends StatelessWidget {
         ),
         child: Swipeable(
           leftBackgroundBuilder: _SwipeableBackground.new,
+          onThresholdReached: () => listener.onRemove(data.index),
           child: Container(
             clipBehavior: Clip.antiAlias,
             decoration: BoxDecoration(
@@ -105,7 +114,7 @@ class _Body extends StatelessWidget {
   );
 
   @override
-  flutter.Widget build(BuildContext context) {
+  Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -127,7 +136,7 @@ class _Title extends StatelessWidget {
   );
   
   @override
-  flutter.Widget build(BuildContext context) {
+  Widget build(BuildContext context) {
     final media = MediaQuery.of(context);
     final theme = Theme.of(context);
     return Row(
@@ -174,7 +183,7 @@ class _DueDate extends StatelessWidget {
   const _DueDate(this.data);
 
   @override
-  flutter.Widget build(BuildContext context) {
+  Widget build(BuildContext context) {
     final media = MediaQuery.of(context);
     final theme = Theme.of(context);
     final services = Services.of(context);
@@ -218,7 +227,7 @@ class _SwipeableBackground extends StatelessWidget {
   const _SwipeableBackground(this.details);
 
   @override
-  flutter.Widget build(BuildContext context) {
+  Widget build(BuildContext context) {
     return Container(
       color: switch (details) {
         DraggingBackgroundBuilderDetails(

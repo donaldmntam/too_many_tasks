@@ -17,6 +17,7 @@ class Swipeable extends StatefulWidget {
   final double swipeDistance;
   final double swipeThreshold;
   final WidgetBuilder leftBackgroundBuilder;
+  final void Function() onThresholdReached;
   final Widget child;
 
   const Swipeable({
@@ -26,6 +27,7 @@ class Swipeable extends StatefulWidget {
     this.swipeThreshold = 75.0,
     this.swipeDistance = 80.0,
     required this.leftBackgroundBuilder,
+    required this.onThresholdReached,
     required this.child,
   });
 
@@ -99,17 +101,20 @@ class _State extends widgets.State<Swipeable>
     final state = this.state;
     switch (state) {
       case Dragging(
-        initialOffset: final initialPosition,
-        currentOffset: final currentPosition,
+        initialOffset: final initialOffset,
+        currentOffset: final currentOffset,
       ):
         final newState = Released(
-          initialPosition,
-          currentPosition,
-          currentPosition,
+          initialOffset,
+          currentOffset,
+          currentOffset,
         );
         this.state = newState;
         setState(() {});
         ticker.start();
+        if (newState.thresholdReached(widget.swipeThreshold)) {
+          widget.onThresholdReached();
+        }
       case Idling():
       case Released():
         break;

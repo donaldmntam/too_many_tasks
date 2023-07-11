@@ -12,12 +12,14 @@ const _returnButtonPadding = 16.0;
 const _animationDuration = Duration(milliseconds: 200);
 
 class Content extends StatefulWidget {
+  final GlobalKey<AnimatedListState> listKey;
   final double fabClearance;
   final Ready state;
   final task_card.Listener listener;
 
   const Content({
     super.key,
+    required this.listKey,
     required this.fabClearance,
     required this.state,
     required this.listener
@@ -81,6 +83,7 @@ class _ContentState extends widgets.State<Content> {
               Flexible(
                 flex: 1,
                 child: _listView(
+                  key: widget.listKey,
                   tasks: widget.state.tasks,
                   pinnedCount: widget.state.pinnedCount,
                   bottomPadding: bottomInset + widget.fabClearance, 
@@ -131,6 +134,7 @@ class _ContentState extends widgets.State<Content> {
 }
 
 Widget _listView({
+  required GlobalKey<AnimatedListState> key,
   required List<Task> tasks,
   required int pinnedCount,
   required double bottomPadding,
@@ -143,8 +147,9 @@ Widget _listView({
       final task = tasks[index];
       final bool pinned = index <= pinnedCount - 1;
       return Padding(
+        key: Key('task$index'),
         padding: _padding(tasks.length, index),
-        child: task_card.Widget(
+        child: task_card.TaskCard(
           (index: index, task: task, pinned: pinned),
           listener,
         ),
@@ -168,11 +173,14 @@ Widget _listView({
     () => SizedBox(height: bottomPadding),
   );
 
-  return ListView.builder(
+  print("widgetBuilder.length ${widgetBuilders.length}");
+
+  return AnimatedList(
+    key: key,
     physics: const BouncingScrollPhysics(),
     controller: scrollController,
-    itemCount: widgetBuilders.length,
-    itemBuilder: (_, index) => widgetBuilders[index](),
+    initialItemCount: widgetBuilders.length,
+    itemBuilder: (_, index, __) => widgetBuilders[index](),
     // separatorBuilder: (context, index) {
     //   if (index == widget.state.pinnedCount - 1) {
     //     return const SizedBox(
