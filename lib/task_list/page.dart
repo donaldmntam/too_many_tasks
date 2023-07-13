@@ -16,7 +16,7 @@ import 'package:too_many_tasks/task_list/widgets/filter_button.dart';
 import 'package:too_many_tasks/task_list/widgets/task_card.dart' as task_card;
 import 'package:too_many_tasks/task_list/widgets/top/top.dart';
 import 'state.dart' as page;
-import './widgets/ready_content.dart' as ready;
+import 'widgets/top/ready_content/ready_content.dart' as ready;
 import './widgets/loading_content.dart'as loading;
 
 // TODO: animation when task is updated
@@ -45,10 +45,9 @@ class Page extends StatefulWidget {
       ? clipboardOverlapHeight
       : clipboardTopWidgetsHeight;
 
-  final listKey = GlobalKey<AnimatedListState>();
   final SlavePort<MasterMessage, SlaveMessage> slavePort;
 
-  Page({
+  const Page({
     super.key,
     required this.slavePort,
   });
@@ -130,27 +129,20 @@ class _State extends State<Page> implements task_card.Listener {
 
   @override
   void onRemove(int index) {
-    print("currentState ${widget.listKey.currentState}");
-    widget.listKey.currentState?.removeItem(
-      index,
-      (context, animation) => Container(
-        color: Colors.red.withAlpha((255 * animation.value).toInt())
-      )
-    );
-    // final state = this.state;
-    // switch (state) {
-    //   case page.Ready():
-    //     final newState = state.copy();
-    //     if (taskIsPinned(index: index, pinnedCount: state.pinnedCount)) {
-    //       newState.pinnedCount--;
-    //     }
-    //     print("removing at $index from list of length ${newState.tasks.length}");
-    //     newState.tasks.removeAt(index);
-    //     this.state = newState;
-    //     setState(() {});
-    //   case page.Loading():
-    //     badTransition(state, "onRemove");
-    // }
+    final state = this.state;
+    switch (state) {
+      case page.Ready():
+        final newState = state.copy();
+        if (taskIsPinned(index: index, pinnedCount: state.pinnedCount)) {
+          newState.pinnedCount--;
+        }
+        print("removing at $index from list of length ${newState.tasks.length}");
+        newState.tasks.removeAt(index);
+        this.state = newState;
+        setState(() {});
+      case page.Loading():
+        badTransition(state, "onRemove");
+    }
   }
 
   void onDataLoaded(Data data) {
@@ -220,7 +212,6 @@ class _State extends State<Page> implements task_card.Listener {
                   child: switch (state) {
                     page.Loading() => loading.Content(state: state),
                     page.Ready() => ready.Content(
-                      listKey: widget.listKey,
                       state: state,
                       listener: this,
                       fabClearance: _fabSize + _fabPadding.bottom,
