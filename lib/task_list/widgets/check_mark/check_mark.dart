@@ -2,7 +2,7 @@ import 'package:flutter/widgets.dart' hide Listener, Widget;
 import 'package:flutter/widgets.dart' as widgets show Widget;
 import 'package:lottie/lottie.dart';
 import 'package:too_many_tasks/common/theme/theme.dart';
-import 'package:too_many_tasks/task_list/widgets/task_card.dart';
+import 'package:too_many_tasks/task_list/widgets/task_card/task_card.dart';
 
 const _checkboxSize = 42.0;
 

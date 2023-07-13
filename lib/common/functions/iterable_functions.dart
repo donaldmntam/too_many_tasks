@@ -6,4 +6,13 @@ extension ExtendedIterable<T> on Iterable<T> {
     }
     return count;
   }
+
+  Iterable<TT> mapIndexed<TT>(TT Function(T e, int i) transform) {
+    var i = 0;
+    return map((e) { 
+      final transformed = transform(e, i);
+      i++;
+      return transformed;
+    });
+  }
 }

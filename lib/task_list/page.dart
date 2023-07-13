@@ -13,7 +13,7 @@ import 'package:too_many_tasks/task_list/models/data.dart';
 import 'package:too_many_tasks/task_list/models/message.dart';
 import 'package:too_many_tasks/task_list/widgets/clipboard.dart';
 import 'package:too_many_tasks/task_list/widgets/filter_button.dart';
-import 'package:too_many_tasks/task_list/widgets/task_card.dart' as task_card;
+import 'package:too_many_tasks/task_list/widgets/task_card/task_card.dart' as task_card;
 import 'package:too_many_tasks/task_list/widgets/top/top.dart';
 import 'state.dart' as page;
 import 'widgets/top/ready_content/ready_content.dart' as ready;
@@ -129,20 +129,20 @@ class _State extends State<Page> implements task_card.Listener {
 
   @override
   void onRemove(int index) {
-    final state = this.state;
-    switch (state) {
-      case page.Ready():
-        final newState = state.copy();
-        if (taskIsPinned(index: index, pinnedCount: state.pinnedCount)) {
-          newState.pinnedCount--;
-        }
-        print("removing at $index from list of length ${newState.tasks.length}");
-        newState.tasks.removeAt(index);
-        this.state = newState;
-        setState(() {});
-      case page.Loading():
-        badTransition(state, "onRemove");
-    }
+    // final state = this.state;
+    // switch (state) {
+    //   case page.Ready():
+    //     final newState = state.copy();
+    //     if (taskIsPinned(index: index, pinnedCount: state.pinnedCount)) {
+    //       newState.pinnedCount--;
+    //     }
+    //     print("removing at $index from list of length ${newState.tasks.length}");
+    //     newState.tasks.removeAt(index);
+    //     this.state = newState;
+    //     setState(() {});
+    //   case page.Loading():
+    //     badTransition(state, "onRemove");
+    // }
   }
 
   void onDataLoaded(Data data) {

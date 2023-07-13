@@ -4,7 +4,7 @@ import 'package:too_many_tasks/common/models/task.dart';
 import 'package:too_many_tasks/common/theme/theme.dart';
 import 'package:too_many_tasks/task_list/state.dart';
 import 'package:too_many_tasks/task_list/widgets/top/ready_content/task_list.dart';
-import '../../task_card.dart' as task_card;
+import '../../task_card/task_card.dart' as task_card;
 import 'package:flutter/widgets.dart' as widgets show State;
 
 const _linePadding = 8.0;
