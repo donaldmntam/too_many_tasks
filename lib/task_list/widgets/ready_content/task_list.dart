@@ -5,11 +5,17 @@ import 'package:too_many_tasks/common/functions/iterable_functions.dart';
 import 'package:too_many_tasks/common/functions/list_functions.dart';
 import 'package:too_many_tasks/common/models/task.dart';
 import 'package:too_many_tasks/common/services/services.dart';
+import 'package:too_many_tasks/common/widgets/proportion_box/proportion_box.dart';
+import 'package:too_many_tasks/task_list/widgets/task_card/state.dart';
 import 'package:too_many_tasks/task_list/widgets/task_card/task_card.dart' as task_card;
 import 'package:too_many_tasks/task_list/widgets/task_card/state.dart' as task_card;
 
+import '../task_card/task_card.dart';
+
 const _listPadding = 20.0;
+const _listItemSpacing = 12.0;
 const _removeAnimationDuration = Duration(milliseconds: 500);
+const _curve = Curves.easeOutQuad;
 
 class TaskList extends StatefulWidget {
   final List<Task> tasks;
@@ -72,20 +78,17 @@ class _TaskListState extends widgets.State<TaskList>
           data: final data,
         ):
           final now = Services.of(context).clock.now();
-          final animationValue = (
+          final rawAnimationValue = (
             now.millisecondsSinceEpoch 
               - cardState.startTime.millisecondsSinceEpoch
           ) / _removeAnimationDuration.inMilliseconds;
-          print("animatinoValue ${animationValue}");
-          print("startTime: ${startTime}");
-          print("now: ${now}");
-          if (animationValue > 1.0) {
+          if (rawAnimationValue > 1.0) {
             cardStates[i] = const task_card.Removed();
             setState(() {});
           } else {
             cardStates[i] = task_card.BeingRemoved(
               startTime: startTime,
-              animationValue: animationValue,
+              animationValue: _curve.transform(rawAnimationValue),
               data: data,
             );
             setState(() {});
@@ -96,33 +99,58 @@ class _TaskListState extends widgets.State<TaskList>
 
   @override
   Widget build(BuildContext context) {
-    final widgetBuilders = cardStates
-      .mapIndexed<Widget Function()>((cardState, index) =>
-        () => Padding(
-          key: Key('task$index'),
-          padding: _padding(widget.tasks.length, index),
-          child: task_card.TaskCard(
-            cardState,
-            // widget.listener,
-            this,
-          ),
-        )
-      ).toList();
-    widgetBuilders.insertInBetween((index) {
-      if (index == widget.pinnedCount - 1) {
-        return () => const SizedBox(
-          height: 16,
-          child: Divider(
-            height: 1,
-            color: Color(0xFFA4A2A0)
+    final widgetBuilders = List<Widget Function()>.empty(growable: true);
+
+    widgetBuilders.add(() => const SizedBox(height: _listPadding));
+
+    for (var index = 0; index < cardStates.length; index++) {
+      final cardState = cardStates[index]; 
+      final data = switch (cardState) {
+        Ready(data: final data) => data,
+        BeingRemoved(data: final data) => data,
+        Removed() => null,
+      };
+      if (data == null) continue;
+      final proportion = switch (cardState) {
+        Ready() => 1.0,
+        BeingRemoved(animationValue: final animationValue) => 1 - animationValue,
+        Removed() => null,
+      };
+      if (proportion == null) continue;
+      final opacity = proportion;
+      widgetBuilders.add(
+        () => ProportionSize(
+          proportion: proportion,
+          child: Opacity(
+            opacity: opacity,
+            child: Padding(
+              padding: _padding(widget.tasks.length, index),
+              child: TaskCard(
+                data,
+                this
+              ),
+            ),
           )
-        );
-      } else {
-        return () => const SizedBox(height: 8);
-      }
-    });
+        ),
+      );
+    }
+    // widgetBuilders.insertInBetween((index) {
+    //   if (index == widget.pinnedCount - 1) {
+    //     return () => const SizedBox(
+    //       height: 16,
+    //       child: Divider(
+    //         height: 1,
+    //         color: Color(0xFFA4A2A0)
+    //       )
+    //     );
+    //   } else {
+    //     return () => const SizedBox(height: 8);
+    //   }
+    // });
     widgetBuilders.add(
-      () => SizedBox(height: widget.bottomPadding),
+      () => SizedBox(
+        height: widget.bottomPadding + _listPadding,
+      ),
     );
 
     return ListView.builder(
@@ -170,19 +198,20 @@ class _TaskListState extends widgets.State<TaskList>
 EdgeInsets _padding(int length, int index) {
   if (index == 0) {
     return const EdgeInsets.only(
-      top: _listPadding,
       left: _listPadding,
       right: _listPadding,
     );
   } else if (index == length - 1) {
     return const EdgeInsets.only(
-      bottom: _listPadding,
+      top: _listItemSpacing,
       left: _listPadding,
       right: _listPadding,
     );
   } else {
-    return const EdgeInsets.symmetric(      
-      horizontal: _listPadding,
+    return const EdgeInsets.only(    
+      top: _listItemSpacing,  
+      left: _listPadding,
+      right: _listPadding,
     );
   }
 }

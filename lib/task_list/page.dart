@@ -16,7 +16,7 @@ import 'package:too_many_tasks/task_list/widgets/filter_button.dart';
 import 'package:too_many_tasks/task_list/widgets/task_card/task_card.dart' as task_card;
 import 'package:too_many_tasks/task_list/widgets/top/top.dart';
 import 'state.dart' as page;
-import 'widgets/top/ready_content/ready_content.dart' as ready;
+import 'widgets/ready_content/ready_content.dart' as ready;
 import './widgets/loading_content.dart'as loading;
 
 // TODO: animation when task is updated
