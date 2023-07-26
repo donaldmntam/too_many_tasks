@@ -159,6 +159,32 @@ class _State extends State<Page> implements task_card.Listener {
     }
   }
 
+  void _onFabTap() {
+    final state = this.state;
+    switch (state) {
+      case page.Ready():
+        showDialog(
+          context: context,
+          builder: (_) => TaskDialog(task: null, presets: state.presets.lock)
+        ).then((task) => _onAddTask(task));
+      case page.Loading():
+        badTransition(state, "_onFabTap");
+    }
+  }
+
+  void _onAddTask(Task task) {
+    final state = this.state;
+    switch (state) {
+      case page.Ready():
+        final newState = state.copy();
+        newState.tasks.add(task);
+        this.state = newState;
+        setState(() {});
+      case page.Loading():
+        badTransition(state, "_onAddTask");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final state = this.state;
@@ -218,11 +244,11 @@ class _State extends State<Page> implements task_card.Listener {
                   child: SizedBox.square(
                     dimension: _fabSize,
                     child: FloatingActionButton(
+                      onPressed: _onFabTap,
                       child: const Icon(
                         Icons.add,
                         size: _fabSize - _fabInnerPadding
                       ),
-                      onPressed: () { print("suh dudes!"); },
                     )
                   ),
                 )

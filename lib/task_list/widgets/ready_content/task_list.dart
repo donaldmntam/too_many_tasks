@@ -1,7 +1,10 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart' hide State, Theme;
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart' as widgets show State;
 import 'package:too_many_tasks/common/functions/iterable_functions.dart';
+import 'package:too_many_tasks/common/functions/list_functions.dart';
 import 'package:too_many_tasks/common/models/task.dart';
 import 'package:too_many_tasks/common/services/services.dart';
 import 'package:too_many_tasks/common/theme/theme.dart';
@@ -10,8 +13,7 @@ import 'package:too_many_tasks/task_list/functions/widget_functions.dart' as fun
 import 'package:too_many_tasks/task_list/widgets/task_card/task_card.dart' as task_card;
 import 'package:too_many_tasks/task_list/widgets/task_card/state.dart' as task_card;
 
-import '../task_card/task_card.dart';
-
+const _addAnimationDuration = Duration(milliseconds: 500);
 const _removeAnimationDuration = Duration(milliseconds: 500);
 const _curve = Curves.easeOutQuad;
 
@@ -59,7 +61,24 @@ class _TaskListState extends widgets.State<TaskList>
     super.dispose();
   }
 
-  // TODO: widget did change --> update cardStates
+  @override
+  void didUpdateWidget(TaskList oldWidget) {
+    // !! assuming that if the task list length is longer, new tasks have
+    // !! been added to the end of the task array
+    if (widget.tasks.length > oldWidget.tasks.length) {
+      final services = Services.of(context);
+      for (var i = oldWidget.tasks.length; i < widget.tasks.length; i++) {
+        cardStates.add(
+          task_card.BeingAdded(
+            startTime: services.clock.now(),
+            animationValue: 0
+          )
+        );
+      }
+    }
+
+    super.didUpdateWidget(oldWidget);
+  }
 
   void onTick(Duration _) {
     for (var i = 0; i < cardStates.length; i++) {
@@ -68,6 +87,24 @@ class _TaskListState extends widgets.State<TaskList>
         case task_card.Ready():
         case task_card.Removed():
           break;
+        case task_card.BeingAdded(
+          startTime: final startTime,
+        ):
+          final now = Services.of(context).clock.now();
+          final rawAnimationValue = (
+            now.millisecondsSinceEpoch 
+              - cardState.startTime.millisecondsSinceEpoch
+          ) / _addAnimationDuration.inMilliseconds;
+          if (rawAnimationValue > 1.0) {
+            cardStates[i] = const task_card.Ready();
+            setState(() {});
+          } else {
+            cardStates[i] = task_card.BeingAdded(
+              startTime: startTime,
+              animationValue: _curve.transform(rawAnimationValue),
+            );
+            setState(() {});
+          }
         case task_card.BeingRemoved(
           startTime: final startTime,
         ):

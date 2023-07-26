@@ -112,9 +112,10 @@ class _TaskDialogState extends State<TaskDialog> {
                   onPressed: () {
                     navigator.pop(
                       (
-                        title: nameController.text,
+                        name: nameController.text,
                         dueDate: dueDate,
                         done: widget.task?.done ?? false,
+                        pinned: false,
                       )
                     );
                   },
