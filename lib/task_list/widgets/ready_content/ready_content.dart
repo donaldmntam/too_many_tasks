@@ -82,7 +82,6 @@ class _ContentState extends widgets.State<Content> {
                 flex: 1,
                 child: TaskList(
                   tasks: widget.state.tasks,
-                  pinnedCount: widget.state.pinnedCount,
                   bottomPadding: bottomInset + widget.fabClearance, 
                   listener: widget.listener,
                   scrollController: controller

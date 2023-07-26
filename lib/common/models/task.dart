@@ -2,6 +2,7 @@ typedef Task = ({
   String name,
   DateTime dueDate,
   bool done,
+  bool pinned,
 });
 
 extension ExtendedTask on Task {
@@ -9,10 +10,12 @@ extension ExtendedTask on Task {
     String? name,
     DateTime? dueDate,
     bool? done,
+    bool? pinned,
   }) => (
     name: name ?? this.name,
     dueDate: dueDate ?? this.dueDate,
     done: done ?? this.done,
+    pinned: pinned ?? this.pinned,
   );
 }
 

@@ -1,25 +1,22 @@
-import 'package:flutter/material.dart' hide State;
+import 'package:flutter/material.dart' hide State, Theme;
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart' as widgets show State;
 import 'package:too_many_tasks/common/functions/iterable_functions.dart';
-import 'package:too_many_tasks/common/functions/list_functions.dart';
 import 'package:too_many_tasks/common/models/task.dart';
 import 'package:too_many_tasks/common/services/services.dart';
-import 'package:too_many_tasks/common/widgets/proportion_box/proportion_box.dart';
-import 'package:too_many_tasks/task_list/widgets/task_card/state.dart';
+import 'package:too_many_tasks/common/theme/theme.dart';
+import 'package:too_many_tasks/task_list/data/widget_data.dart';
+import 'package:too_many_tasks/task_list/functions/widget_functions.dart' as functions;
 import 'package:too_many_tasks/task_list/widgets/task_card/task_card.dart' as task_card;
 import 'package:too_many_tasks/task_list/widgets/task_card/state.dart' as task_card;
 
 import '../task_card/task_card.dart';
 
-const _listPadding = 20.0;
-const _listItemSpacing = 12.0;
 const _removeAnimationDuration = Duration(milliseconds: 500);
 const _curve = Curves.easeOutQuad;
 
 class TaskList extends StatefulWidget {
   final List<Task> tasks;
-  final int pinnedCount;
   final double bottomPadding;
   final task_card.Listener listener;
   final ScrollController scrollController;
@@ -27,7 +24,6 @@ class TaskList extends StatefulWidget {
   const TaskList({
     super.key,
     required this.tasks,
-    required this.pinnedCount,
     required this.bottomPadding,
     required this.listener,
     required this.scrollController,
@@ -47,10 +43,7 @@ class _TaskListState extends widgets.State<TaskList>
   @override
   void initState() {
     cardStates = widget.tasks.mapIndexed<task_card.State>((task, index) {
-      final bool pinned = index <= widget.pinnedCount - 1;
-      return task_card.Ready(
-        data: (index: index, task: task, pinned: pinned)
-      );
+      return const task_card.Ready();
     }).toList();
 
     ticker = createTicker(onTick);
@@ -66,6 +59,8 @@ class _TaskListState extends widgets.State<TaskList>
     super.dispose();
   }
 
+  // TODO: widget did change --> update cardStates
+
   void onTick(Duration _) {
     for (var i = 0; i < cardStates.length; i++) {
       final cardState = cardStates[i];
@@ -75,7 +70,6 @@ class _TaskListState extends widgets.State<TaskList>
           break;
         case task_card.BeingRemoved(
           startTime: final startTime,
-          data: final data,
         ):
           final now = Services.of(context).clock.now();
           final rawAnimationValue = (
@@ -89,7 +83,6 @@ class _TaskListState extends widgets.State<TaskList>
             cardStates[i] = task_card.BeingRemoved(
               startTime: startTime,
               animationValue: _curve.transform(rawAnimationValue),
-              data: data,
             );
             setState(() {});
           }
@@ -99,57 +92,31 @@ class _TaskListState extends widgets.State<TaskList>
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     final widgetBuilders = List<Widget Function()>.empty(growable: true);
 
-    widgetBuilders.add(() => const SizedBox(height: _listPadding));
+    widgetBuilders.add(() => const SizedBox(height: taskListPadding));
 
-    for (var index = 0; index < cardStates.length; index++) {
-      final cardState = cardStates[index]; 
-      final data = switch (cardState) {
-        Ready(data: final data) => data,
-        BeingRemoved(data: final data) => data,
-        Removed() => null,
-      };
-      if (data == null) continue;
-      final proportion = switch (cardState) {
-        Ready() => 1.0,
-        BeingRemoved(animationValue: final animationValue) => 1 - animationValue,
-        Removed() => null,
-      };
-      if (proportion == null) continue;
-      final opacity = proportion;
-      widgetBuilders.add(
-        () => ProportionSize(
-          proportion: proportion,
-          child: Opacity(
-            opacity: opacity,
-            child: Padding(
-              padding: _padding(widget.tasks.length, index),
-              child: TaskCard(
-                data,
-                this
-              ),
-            ),
-          )
-        ),
-      );
+    final pinnedTasksBuilders = 
+      functions.pinnedTasksBuilders(widget.tasks, cardStates, this);
+    if (pinnedTasksBuilders.isNotEmpty) {
+      widgetBuilders.addAll(pinnedTasksBuilders);
+      widgetBuilders.add(() => Padding(
+        padding: middleTaskListItemEdgeInsets,
+        child: Divider(
+          color: theme.colors.onBackground400,
+        )
+      ));
     }
-    // widgetBuilders.insertInBetween((index) {
-    //   if (index == widget.pinnedCount - 1) {
-    //     return () => const SizedBox(
-    //       height: 16,
-    //       child: Divider(
-    //         height: 1,
-    //         color: Color(0xFFA4A2A0)
-    //       )
-    //     );
-    //   } else {
-    //     return () => const SizedBox(height: 8);
-    //   }
-    // });
+
+    widgetBuilders.addAll(
+      functions.unpinnedTasksBuilders(widget.tasks, cardStates, this)
+    );
+    
     widgetBuilders.add(
       () => SizedBox(
-        height: widget.bottomPadding + _listPadding,
+        height: widget.bottomPadding + taskListPadding,
       ),
     );
 
@@ -181,37 +148,15 @@ class _TaskListState extends widgets.State<TaskList>
     // widget.listener.onRemove(index);
     final cardState = cardStates[index];
     switch (cardState) {
-      case task_card.Ready(data: final data):
+      case task_card.Ready():
         final clock = Services.of(context).clock;
         cardStates[index] = task_card.BeingRemoved(
           startTime: clock.now(),
-          data: data,
           animationValue: 0.0
         );
         setState(() {});
       default:
         break;
     }
-  }
-}
-
-EdgeInsets _padding(int length, int index) {
-  if (index == 0) {
-    return const EdgeInsets.only(
-      left: _listPadding,
-      right: _listPadding,
-    );
-  } else if (index == length - 1) {
-    return const EdgeInsets.only(
-      top: _listItemSpacing,
-      left: _listPadding,
-      right: _listPadding,
-    );
-  } else {
-    return const EdgeInsets.only(    
-      top: _listItemSpacing,  
-      left: _listPadding,
-      right: _listPadding,
-    );
   }
 }

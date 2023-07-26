@@ -110,18 +110,11 @@ class _State extends State<Page> implements task_card.Listener {
     switch (state) {
       case page.Ready():
         final newState = state.copy();
-        final taskToPin = newState.tasks.removeAt(index);
-        if (taskIsPinned(index: index, pinnedCount: state.pinnedCount)) {
-          newState.tasks.add(taskToPin);
-          newState.pinnedCount--;
-          this.state = newState;
-          setState(() {});
-        } else {
-          newState.tasks.insert(state.pinnedCount, taskToPin);
-          newState.pinnedCount++;
-          this.state = newState;
-          setState(() {});
-        }
+        final taskToPin = newState.tasks[index];
+        final newTask = taskToPin.copy(pinned: !taskToPin.pinned);
+        newState.tasks[index] = newTask;
+        this.state = newState;
+        setState(() {});
       case page.Loading():
         badTransition(state, "onPinPressed");
     }
@@ -152,7 +145,6 @@ class _State extends State<Page> implements task_card.Listener {
         final newState = page.Ready(
           tasks: data.tasks.unlock,
           presets: data.presets.unlock,
-          pinnedCount: 0,
         );
         setState(() => this.state = newState);
       case page.Ready():

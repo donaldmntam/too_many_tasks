@@ -1,18 +1,14 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart' hide Theme, State;
-import 'package:lottie/lottie.dart';
 import 'package:too_many_tasks/common/functions/date_functions.dart';
-import 'package:too_many_tasks/common/functions/scope_functions.dart';
 import 'package:too_many_tasks/common/models/task.dart';
 import 'package:too_many_tasks/common/services/services.dart';
 import 'package:too_many_tasks/common/theme/theme.dart';
-import 'package:too_many_tasks/common/widgets/proportion_box/proportion_box.dart';
 import 'package:too_many_tasks/common/widgets/swipeable/details.dart';
 import 'package:too_many_tasks/common/widgets/swipeable/swipeable.dart';
 
 import '../check_mark/check_mark.dart';
-import 'state.dart';
 
 const _headerWidth = 32.0;
 final _borderRadius = BorderRadius.circular(12);
@@ -25,22 +21,23 @@ abstract interface class Listener {
   void onRemove(int index);
 }
 
-typedef Data = ({int index, Task task, bool pinned});
-
 class TaskCard extends StatelessWidget {
-  final Data data;
+  final int index;
+  final Task task;
   final Listener listener;
 
   const TaskCard(
-    this.data,
+    this.index,
+    this.task,
     this.listener,
     {super.key}
   );
 
   @override
   Widget build(BuildContext context) {
-    return _Background(        
-      data: data,
+    return _Background(   
+      index: index,     
+      task: task,
       listener: listener,
       child: Padding(
         padding: _padding,
@@ -49,9 +46,9 @@ class TaskCard extends StatelessWidget {
             Flexible(
               flex: 1,
               fit: FlexFit.tight,
-              child: _Body(data, listener),
+              child: _Body(index, task, listener),
             ),
-            CheckMark(data, listener),
+            CheckMark(index, task, listener),
           ]
         ),
       )
@@ -60,12 +57,14 @@ class TaskCard extends StatelessWidget {
 }
 
 class _Background extends StatelessWidget {
-  final Data data;
+  final int index;
+  final Task task;
   final Listener listener;
   final Widget child;
 
   const _Background({
-    required this.data,
+    required this.index,
+    required this.task,
     required this.listener,
     required this.child
   });
@@ -82,7 +81,7 @@ class _Background extends StatelessWidget {
         ),
         child: Swipeable(
           leftBackgroundBuilder: _SwipeableBackground.new,
-          onThresholdReached: () => listener.onRemove(data.index),
+          onThresholdReached: () => listener.onRemove(index),
           child: Container(
             clipBehavior: Clip.antiAlias,
             decoration: BoxDecoration(
@@ -107,11 +106,13 @@ class _Background extends StatelessWidget {
 }
 
 class _Body extends StatelessWidget {
-  final Data data;
+  final int index;
+  final Task task;
   final Listener listener;
 
   const _Body(
-    this.data,
+    this.index,
+    this.task,
     this.listener,
   );
 
@@ -120,20 +121,22 @@ class _Body extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _Title(data, listener),
+        _Title(index, task, listener),
         const SizedBox(height: 8),
-        _DueDate(data),
+        _DueDate(index, task),
       ]
     );
   }
 }
 
 class _Title extends StatelessWidget {
-  final Data data;
+  final int index;
+  final Task task;
   final Listener listener;
 
   const _Title(
-    this.data,
+    this.index,
+    this.task,
     this.listener,
   );
   
@@ -144,13 +147,13 @@ class _Title extends StatelessWidget {
     return Row(
       children: [
         GestureDetector(
-          onTap: () => listener.onPinPressed(data.index),
+          onTap: () => listener.onPinPressed(index),
           child: Transform.rotate(
-            angle: data.pinned ? 0 : pi * 0.5 * 3.5,
+            angle: task.pinned ? 0 : pi * 0.5 * 3.5,
             child: Icon(
               Icons.push_pin_outlined,
               size: 18 * media.textScaleFactor,
-              color: data.pinned
+              color: task.pinned
                 ? theme.colors.onBackground400
                 : theme.colors.onBackground100,
             ),
@@ -158,7 +161,7 @@ class _Title extends StatelessWidget {
         ),
         SizedBox(width: 4 * media.textScaleFactor),
         Text(
-          data.task.name,
+          task.name,
           style: theme.textStyle(
             size: 16,
             weight: FontWeight.w400,
@@ -167,7 +170,7 @@ class _Title extends StatelessWidget {
         ),
         SizedBox(width: 4 * media.textScaleFactor),
         GestureDetector(
-          onTap: () => listener.onEditPressed(data.index),
+          onTap: () => listener.onEditPressed(index),
           child: Icon(
             Icons.edit_outlined,
             size: 18 * media.textScaleFactor,
@@ -180,19 +183,20 @@ class _Title extends StatelessWidget {
 }
 
 class _DueDate extends StatelessWidget {
-  final Data data;
+  final int number;
+  final Task task;
 
-  const _DueDate(this.data);
+  const _DueDate(this.number, this.task);
 
   @override
   Widget build(BuildContext context) {
     final media = MediaQuery.of(context);
     final theme = Theme.of(context);
     final services = Services.of(context);
-    final overdue = data.task.dueDate.isAfter(services.clock.now());
+    final overdue = task.dueDate.isAfter(services.clock.now());
     final text = switch (overdue) {
       true => "Overdue", // TODO: localization!
-      false => data.task.dueDate.toFormattedString(),
+      false => task.dueDate.toFormattedString(),
     };
     final textColor = switch (overdue) {
       true => theme.colors.error,

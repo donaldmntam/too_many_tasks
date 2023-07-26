@@ -1,17 +1,20 @@
 import 'package:flutter/widgets.dart' hide Listener, Widget;
 import 'package:flutter/widgets.dart' as widgets show Widget;
 import 'package:lottie/lottie.dart';
+import 'package:too_many_tasks/common/models/task.dart';
 import 'package:too_many_tasks/common/theme/theme.dart';
 import 'package:too_many_tasks/task_list/widgets/task_card/task_card.dart';
 
 const _checkboxSize = 42.0;
 
 class CheckMark extends StatefulWidget {
-  final Data data;
+  final int index;
+  final Task task;
   final Listener listener;
 
   const CheckMark(
-    this.data,
+    this.index,
+    this.task,
     this.listener,
     {super.key}
   );
@@ -25,7 +28,7 @@ class _CheckMarkState extends State<CheckMark> with TickerProviderStateMixin {
 
   @override
   void initState() {
-    final done = widget.data.task.done;
+    final done = widget.task.done;
 
     controller = AnimationController(
       vsync: this,
@@ -51,8 +54,8 @@ class _CheckMarkState extends State<CheckMark> with TickerProviderStateMixin {
 
   @override
   void didUpdateWidget(CheckMark oldWidget) {
-    final newDone = widget.data.task.done;
-    if (newDone != oldWidget.data.task.done) {
+    final newDone = widget.task.done;
+    if (newDone != oldWidget.task.done) {
       if (newDone) {
         controller.forward();
       } else {
@@ -67,7 +70,7 @@ class _CheckMarkState extends State<CheckMark> with TickerProviderStateMixin {
   widgets.Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return GestureDetector(
-      onTap: () => widget.listener.onCheckMarkPressed(widget.data.index),
+      onTap: () => widget.listener.onCheckMarkPressed(widget.index),
       child: SizedBox(
         width: _checkboxSize,
         height: _checkboxSize,
@@ -75,7 +78,7 @@ class _CheckMarkState extends State<CheckMark> with TickerProviderStateMixin {
         //   shape: BoxShape.circle,
         //   color: theme.colors.secondary,
         // ),
-        child: widget.data.task.done || true ? Center(
+        child: widget.task.done || true ? Center(
           child: Lottie.asset(          
             'assets/lottie/task_card_check_mark_check.json',
             controller: controller,
