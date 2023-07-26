@@ -2,6 +2,7 @@ import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:flutter/material.dart' hide Dialog, Theme, TextButton;
 import 'package:too_many_tasks/common/functions/date_functions.dart';
 import 'package:too_many_tasks/common/models/task.dart';
+import 'package:too_many_tasks/common/services/services.dart';
 import 'package:too_many_tasks/common/theme/theme.dart';
 import 'package:too_many_tasks/common/widgets/button/style.dart';
 import 'package:too_many_tasks/common/widgets/button/text_button.dart';
@@ -64,6 +65,8 @@ class _TaskDialogState extends State<TaskDialog> {
   Widget build(BuildContext context) {
     final strings = Strings.of(context);
     final navigator = Navigator.of(context);
+    final services = Services.of(context);
+    final now = services.clock.now();
     return Dialog(
       child: DialogScaffold(
         title: switch (widget.task) {
@@ -125,9 +128,9 @@ class _TaskDialogState extends State<TaskDialog> {
             ]
           ),
           secondChild: CalendarDatePicker(
-            initialDate: DateTime(2023, 5, 18),
-            firstDate: DateTime(2023, 5, 17),
-            lastDate: DateTime(2023, 5, 19),
+            initialDate: now,
+            firstDate: DateTime(now.year - 100, now.month, now.day),
+            lastDate: DateTime(now.year + 100, now.month, now.day),
             onDateChanged: (date) {
               setState(() {
                 crossFadeState = CrossFadeState.showFirst;
