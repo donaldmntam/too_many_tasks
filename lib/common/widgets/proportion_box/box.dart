@@ -27,13 +27,14 @@ class Box extends RenderProxyBox {
   void paint(PaintingContext context, Offset offset) {
     final child = this.child;
     if (child == null) return;
-    layer = context.pushClipRect(
-      needsCompositing,
-      offset,
-      Offset.zero & size,
-      super.paint,
-      oldLayer: layer is ClipRectLayer ? layer! as ClipRectLayer : null,
-      clipBehavior: Clip.antiAlias,
-    );
+    context.paintChild(child, offset);
+    // layer = context.pushClipRect(
+    //   needsCompositing,
+    //   offset,
+    //   Offset.zero & size,
+    //   super.paint,
+    //   oldLayer: layer is ClipRectLayer ? layer! as ClipRectLayer : null,
+    //   clipBehavior: Clip.antiAlias,
+    // );
   }
 }

@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:too_many_tasks/common/widgets/proportion_box/box.dart';
 
 class ProportionSize extends SingleChildRenderObjectWidget {
-  final double proportion;
+  final double heightProportion;
 
   const ProportionSize({
     super.key,
-    required this.proportion,
+    required this.heightProportion,
     required super.child,
   });
 
@@ -17,7 +17,7 @@ class ProportionSize extends SingleChildRenderObjectWidget {
 
   @override
   void updateRenderObject(BuildContext context, Box renderObject) {
-    renderObject.proportion = proportion;
+    renderObject.proportion = heightProportion;
     renderObject.markNeedsLayout();
   }
 }

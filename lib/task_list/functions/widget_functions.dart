@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:too_many_tasks/common/functions/number_functions.dart';
 import 'package:too_many_tasks/common/models/task.dart';
 import 'package:too_many_tasks/common/widgets/proportion_box/proportion_box.dart';
 import 'package:too_many_tasks/task_list/data/widget_data.dart';
@@ -56,11 +57,14 @@ List<Widget Function()> _taskBuilders(
       task_card.Removed() => null,
     };
     if (visibility == null) continue;
+    final heightProportion = visibility.coerceAtMost(0.2) / 0.2;
+    final opacity = (visibility.coerceAtLeast(0.2) - 0.2) / 0.8;
+    print("height: ${heightProportion} opacity: ${opacity} visibility ${visibility}");
     builders.add(
       () => ProportionSize(
-        proportion: visibility,
+        heightProportion: heightProportion,
         child: Opacity(
-          opacity: visibility,
+          opacity: opacity,
           child: Padding(
             padding: taskItemPadding(tasks.length, index),
             child: task_card.TaskCard(index, task, listener),

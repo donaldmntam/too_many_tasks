@@ -42,7 +42,7 @@ class _State extends State<AnimatedProportionBox>
   @override
   Widget build(BuildContext context) {
     return ProportionSize(
-      proportion: proportion,
+      heightProportion: proportion,
       child: widget.child,
     );
   }
