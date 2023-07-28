@@ -66,7 +66,7 @@ class _TaskDialogState extends State<TaskDialog> {
     final strings = Strings.of(context);
     final navigator = Navigator.of(context);
     final services = Services.of(context);
-    final now = services.clock.now();
+    final now = services.calendar.now();
     return Dialog(
       child: DialogScaffold(
         title: switch (widget.task) {

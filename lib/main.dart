@@ -3,24 +3,25 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:too_many_tasks/common/coordinator/coordinator.dart';
 import 'package:too_many_tasks/common/services/clock.dart';
 import 'package:too_many_tasks/common/services/shared_preferences.dart';
-import 'package:too_many_tasks/common/widgets/proportion_box/proportion_box.dart';
-import 'package:too_many_tasks/task_list/page.dart' as task_list;
 import 'package:flutter_gen/gen_l10n/strings.dart';
-import 'package:too_many_tasks/task_list/widgets/task_card/layout.dart';
 
 import 'common/services/services.dart';
 import 'common/theme/theme.dart';
-import 'common/widgets/proportion_box/animated_proportion_box.dart';
 
 void main() {
   runApp(const MainApp());
 }
 
-class FrozenClock implements Clock {
+class FrozenClock implements Calendar {
   const FrozenClock();
 
   @override
   DateTime now() {
+    return DateTime(2023, 5, 14);
+  }
+
+  @override
+  DateTime today() {
     return DateTime(2023, 5, 14);
   }
 }
@@ -33,7 +34,7 @@ class MainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     const sharedPreferences = DefaultSharedPreferences();
     return const Services(
-      clock: DefaultClock(),
+      calendar: DefaultClock(),
       sharedPreferences: sharedPreferences,
       child: Theme(
         colors: testColors,

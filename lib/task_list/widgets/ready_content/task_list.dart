@@ -1,10 +1,7 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart' hide State, Theme;
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart' as widgets show State;
 import 'package:too_many_tasks/common/functions/iterable_functions.dart';
-import 'package:too_many_tasks/common/functions/list_functions.dart';
 import 'package:too_many_tasks/common/models/task.dart';
 import 'package:too_many_tasks/common/services/services.dart';
 import 'package:too_many_tasks/common/theme/theme.dart';
@@ -15,7 +12,6 @@ import 'package:too_many_tasks/task_list/widgets/task_card/state.dart' as task_c
 
 const _addAnimationDuration = Duration(milliseconds: 500);
 const _removeAnimationDuration = Duration(milliseconds: 500);
-const _curve = Curves.easeOutQuad;
 
 class TaskList extends StatefulWidget {
   final List<Task> tasks;
@@ -70,7 +66,7 @@ class _TaskListState extends widgets.State<TaskList>
       for (var i = oldWidget.tasks.length; i < widget.tasks.length; i++) {
         cardStates.add(
           task_card.BeingAdded(
-            startTime: services.clock.now(),
+            startTime: services.calendar.now(),
             animationValue: 0
           )
         );
@@ -90,36 +86,36 @@ class _TaskListState extends widgets.State<TaskList>
         case task_card.BeingAdded(
           startTime: final startTime,
         ):
-          final now = Services.of(context).clock.now();
-          final rawAnimationValue = (
+          final now = Services.of(context).calendar.now();
+          final animationValue = (
             now.millisecondsSinceEpoch 
               - cardState.startTime.millisecondsSinceEpoch
           ) / _addAnimationDuration.inMilliseconds;
-          if (rawAnimationValue > 1.0) {
+          if (animationValue > 1.0) {
             cardStates[i] = const task_card.Ready();
             setState(() {});
           } else {
             cardStates[i] = task_card.BeingAdded(
               startTime: startTime,
-              animationValue: _curve.transform(rawAnimationValue),
+              animationValue: animationValue,
             );
             setState(() {});
           }
         case task_card.BeingRemoved(
           startTime: final startTime,
         ):
-          final now = Services.of(context).clock.now();
-          final rawAnimationValue = (
+          final now = Services.of(context).calendar.now();
+          final animationValue = (
             now.millisecondsSinceEpoch 
               - cardState.startTime.millisecondsSinceEpoch
           ) / _removeAnimationDuration.inMilliseconds;
-          if (rawAnimationValue > 1.0) {
+          if (animationValue > 1.0) {
             cardStates[i] = const task_card.Removed();
             setState(() {});
           } else {
             cardStates[i] = task_card.BeingRemoved(
               startTime: startTime,
-              animationValue: _curve.transform(rawAnimationValue),
+              animationValue: animationValue,
             );
             setState(() {});
           }
@@ -186,7 +182,7 @@ class _TaskListState extends widgets.State<TaskList>
     final cardState = cardStates[index];
     switch (cardState) {
       case task_card.Ready():
-        final clock = Services.of(context).clock;
+        final clock = Services.of(context).calendar;
         cardStates[index] = task_card.BeingRemoved(
           startTime: clock.now(),
           animationValue: 0.0

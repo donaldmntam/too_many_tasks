@@ -7,6 +7,7 @@ import 'package:too_many_tasks/common/services/services.dart';
 import 'package:too_many_tasks/common/theme/theme.dart';
 import 'package:too_many_tasks/common/widgets/swipeable/details.dart';
 import 'package:too_many_tasks/common/widgets/swipeable/swipeable.dart';
+import 'package:flutter_gen/gen_l10n/strings.dart';
 
 import '../check_mark/check_mark.dart';
 
@@ -190,12 +191,13 @@ class _DueDate extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final strings = Strings.of(context);
     final media = MediaQuery.of(context);
     final theme = Theme.of(context);
     final services = Services.of(context);
-    final overdue = task.dueDate.isAfter(services.clock.now());
+    final overdue = services.calendar.today().isAfter(task.dueDate);
     final text = switch (overdue) {
-      true => "Overdue", // TODO: localization!
+      true => strings.task_card_overdue,
       false => task.dueDate.toFormattedString(),
     };
     final textColor = switch (overdue) {

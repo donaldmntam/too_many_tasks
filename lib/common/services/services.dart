@@ -4,12 +4,12 @@ import 'package:too_many_tasks/common/services/clock.dart';
 import 'package:too_many_tasks/common/services/shared_preferences.dart';
 
 class Services extends InheritedWidget {
-  final Clock clock;
+  final Calendar calendar;
   final SharedPreferences sharedPreferences;
 
   const Services({
     super.key,
-    required this.clock,
+    required this.calendar,
     required this.sharedPreferences,
     required super.child
   });

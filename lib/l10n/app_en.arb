@@ -8,5 +8,7 @@
     "task_dialog_edit_task_confirm_button": "OK",
 
     "task_list_filter_button": "Filter",
-    "task_list_progress": "Today's Progress"
+    "task_list_progress": "Today's Progress",
+
+    "task_card_overdue": "Overdue"
 }

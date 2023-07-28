@@ -43,7 +43,7 @@ class _State extends widgets.State<Tappable> with SingleTickerProviderStateMixin
   }
 
   void onTick(Duration duration) {
-    final now = Services.of(context).clock.now();
+    final now = Services.of(context).calendar.now();
     switch (state) {
       case GoingUp(reference: final reference):
         final currentDurationMillis = now.millisecondsSinceEpoch - 
@@ -78,7 +78,7 @@ class _State extends widgets.State<Tappable> with SingleTickerProviderStateMixin
   }
 
   void onTapUp() {
-    final now = Services.of(context).clock.now();
+    final now = Services.of(context).calendar.now();
     switch (state) {
       case Down():
         state = GoingUp(now);

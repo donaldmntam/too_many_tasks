@@ -59,7 +59,6 @@ List<Widget Function()> _taskBuilders(
     if (visibility == null) continue;
     final heightProportion = visibility.coerceAtMost(0.2) / 0.2;
     final opacity = (visibility.coerceAtLeast(0.2) - 0.2) / 0.8;
-    print("height: ${heightProportion} opacity: ${opacity} visibility ${visibility}");
     builders.add(
       () => ProportionSize(
         heightProportion: heightProportion,
