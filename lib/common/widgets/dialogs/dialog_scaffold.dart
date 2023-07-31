@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart' hide Theme;
 import 'package:too_many_tasks/common/theme/theme.dart';
+import 'package:too_many_tasks/common/widgets/tappable/tappable.dart';
 
 const _buttonSize = 32.0;
 const _columnSpacing = 16.0;
@@ -35,10 +36,9 @@ class DialogScaffold extends StatelessWidget {
                   SizedBox(
                     width: _buttonSize,
                     height: _buttonSize,
-                    child: IconButton(
+                    child: Tappable(
                       onPressed: () => navigator.pop(),
-                      padding: EdgeInsets.zero,
-                      icon: Icon(
+                      child: Icon(
                         Icons.close,
                         color: theme.colors.onBackground400,
                         size: _buttonSize,

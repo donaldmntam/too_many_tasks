@@ -1,22 +1,24 @@
 import 'package:too_many_tasks/common/coordinator/typedefs.dart';
-import 'package:too_many_tasks/common/models/task.dart';
-import 'package:too_many_tasks/common/util_classes/channel/ports.dart';
-import 'package:too_many_tasks/task_list/models/message.dart' as task_list;
+import 'tasks_state.dart' as tasks;
+import 'presets_state.dart' as presets;
 
 class State {
   // TODO: add preset before presets are loaded?
-  List<TaskPreset>? presets;
+  presets.State presetsState;
+  tasks.State tasksState;
   final TaskListMasterPort taskListMasterPort;
   TaskListSlavePort taskListSlavePort;
 
   State({
-    required this.presets,
+    required this.presetsState,
+    required this.tasksState,
     required this.taskListMasterPort,
     required this.taskListSlavePort,
   });
 
   State copy() => State(
-    presets: presets?.toList(growable: true),
+    presetsState: presetsState.copy(),
+    tasksState: tasksState.copy(),
     taskListMasterPort: taskListMasterPort,
     taskListSlavePort: taskListSlavePort,
   );

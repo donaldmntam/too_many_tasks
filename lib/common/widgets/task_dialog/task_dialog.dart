@@ -127,16 +127,19 @@ class _TaskDialogState extends State<TaskDialog> {
               const SizedBox(height: verticalPadding),
             ]
           ),
-          secondChild: CalendarDatePicker(
-            initialDate: now,
-            firstDate: DateTime(now.year - 100, now.month, now.day),
-            lastDate: DateTime(now.year + 100, now.month, now.day),
-            onDateChanged: (date) {
-              setState(() {
-                crossFadeState = CrossFadeState.showFirst;
-                dueDate = date;
-              });
-            }
+          secondChild: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
+            child: CalendarDatePicker(
+              initialDate: now,
+              firstDate: DateTime(now.year - 100, now.month, now.day),
+              lastDate: DateTime(now.year + 100, now.month, now.day),
+              onDateChanged: (date) {
+                setState(() {
+                  crossFadeState = CrossFadeState.showFirst;
+                  dueDate = date;
+                });
+              }
+            ),
           ),
         )
       )

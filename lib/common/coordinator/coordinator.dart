@@ -7,6 +7,8 @@ import 'package:too_many_tasks/common/util_classes/channel/ports.dart';
 import 'package:too_many_tasks/task_list/models/message.dart' as task_list;
 import 'package:too_many_tasks/task_list/page.dart' as task_list;
 import 'state.dart';
+import 'tasks_state.dart' as tasks;
+import 'presets_state.dart' as presets;
 
 class Coordinator extends flutter.StatefulWidget {
   final SharedPreferences sharedPreferences;
@@ -34,15 +36,16 @@ class _WidgetState extends flutter.State<Coordinator> {
     final (taskListMasterPort, taskListSlavePort) =
       ports<task_list.MasterMessage, task_list.SlaveMessage>();
     state = State(
-      presets: null,
+      presetsState: const presets.Start(),
+      tasksState: const tasks.Start(),
       taskListMasterPort: taskListMasterPort,
       taskListSlavePort: taskListSlavePort,
     );
     super.initState();
-    loadPresets();
+    _loadData();
   }
 
-  void loadPresets() async {
+  void _loadData() async {
     await Future.delayed(const Duration(seconds: 2));
     // final presets = state.presets;
     // if (presets == null) {
@@ -54,8 +57,8 @@ class _WidgetState extends flutter.State<Coordinator> {
     state.taskListMasterPort.transmit(
       task_list.DataInitialized(
         (
-          presets: [
-            (name: "Preset1")
+          presets: <({String name})>[
+            // (name: "Preset1")
           ].lock,
           tasks: [
             (name: "Task 1", dueDate: DateTime.now(), done: false, pinned: false),

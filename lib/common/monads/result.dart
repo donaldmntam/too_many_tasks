@@ -20,4 +20,14 @@ extension ExtendedResult<T> on Result<T> {
         " an Err. The wrapped value was: $value"
     };
   }
+
+  Result<R> flatMap<R>(Result<R> Function(T) transform) {
+    final result = this;
+    switch (result) {
+      case Ok(value: final value):
+        return transform(value);
+      case Err():
+        return result;
+    }
+  }
 }

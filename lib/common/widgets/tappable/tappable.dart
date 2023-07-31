@@ -1,21 +1,31 @@
-import 'dart:math';
-
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart' hide State;
 import 'package:flutter/widgets.dart' as widgets show State;
 import 'package:too_many_tasks/common/services/services.dart';
 
-const _minOpacity = 0.0;
-const _maxOpacity = 1.0;
 const _durationMillis = 300;
-const _opacityRate = (_maxOpacity - _minOpacity) / _durationMillis;
+double _opacityRate(double minOpacity, double maxOpacity) => 
+  (maxOpacity - minOpacity) / _durationMillis;
+double _calcOpacity({
+  required double maxOpacity,
+  required double minOpacity,
+  required DateTime reference,
+  required DateTime now
+}) {
+  return (now.millisecondsSinceEpoch - reference.millisecondsSinceEpoch) * 
+    _opacityRate(minOpacity, maxOpacity) + minOpacity;
+}
 
 class Tappable extends StatefulWidget {
+  final double minOpacity;
+  final double maxOpacity;
   final void Function() onPressed;
   final Widget child;
 
   const Tappable({
     super.key,
+    this.minOpacity = 0.2,
+    this.maxOpacity = 1.0,
     required this.onPressed,
     required this.child,
   });
@@ -27,13 +37,15 @@ class Tappable extends StatefulWidget {
 class _State extends widgets.State<Tappable> with SingleTickerProviderStateMixin {
   late final Ticker ticker;
   State state = const Up();
-  double opacity = _maxOpacity;
+  late double opacity;
 
   @override
   void initState() {
     super.initState();
     final ticker = createTicker(onTick);
     this.ticker = ticker;
+
+    opacity = widget.maxOpacity;
   }
 
   @override
@@ -50,11 +62,16 @@ class _State extends widgets.State<Tappable> with SingleTickerProviderStateMixin
           reference.millisecondsSinceEpoch;
         final isUp = currentDurationMillis >= _durationMillis;
         if (isUp) {
-          setState(() => opacity = _maxOpacity);
+          setState(() => opacity = widget.maxOpacity);
           state = const Up();
           ticker.stop();
         } else {
-          setState(() => opacity = calcOpacity(reference, now));
+          setState(() => opacity = _calcOpacity(
+            minOpacity: widget.minOpacity,
+            maxOpacity: widget.maxOpacity,
+            reference: reference,
+            now: now
+          ));
         }
       // case Down():
       //   setState(() => opacity = _minOpacity);
@@ -70,19 +87,19 @@ class _State extends widgets.State<Tappable> with SingleTickerProviderStateMixin
       case Up():
       case GoingUp():
         ticker.stop();
-        setState(() => opacity = _minOpacity);
+        setState(() => opacity = widget.minOpacity);
         state = const Down();
       default:
         break;
     }
   }
 
-  void onTapUp() {
+  void onTapUp({required bool cancelled}) {
     final now = Services.of(context).calendar.now();
     switch (state) {
       case Down():
         state = GoingUp(now);
-        widget.onPressed();
+        if (!cancelled) widget.onPressed();
         ticker.start();
       default:
         break;
@@ -93,13 +110,14 @@ class _State extends widgets.State<Tappable> with SingleTickerProviderStateMixin
   Widget build(BuildContext context) {
     return Opacity(
       opacity: switch (state) {
-        Down() => _minOpacity,
+        Down() => widget.minOpacity,
         GoingUp() => opacity,
         Up() => 1.0,
       },
       child: GestureDetector(
         onTapDown: (_) => onTapDown(),
-        onTapUp: (_) => onTapUp(),
+        onTapUp: (_) => onTapUp(cancelled: false),
+        onTapCancel: () => onTapUp(cancelled: true), 
         child: widget.child,
       )
     );
@@ -122,9 +140,4 @@ class GoingUp implements State {
 
 class Up implements State {
   const Up();
-}
-
-double calcOpacity(DateTime reference, DateTime now) {
-  return (now.millisecondsSinceEpoch - reference.millisecondsSinceEpoch) * 
-    _opacityRate + _minOpacity;
 }
