@@ -2,6 +2,10 @@ import 'package:too_many_tasks/common/models/task.dart';
 
 sealed class State {}
 
+final class Start implements State {
+  const Start();
+}
+
 final class Loading implements State {
   const Loading();
 }
@@ -16,6 +20,10 @@ final class Ready implements State {
   Ready copy() => Ready(
     tasks: tasks.toList(),
   );
+}
+
+final class FailedToLoad implements State {
+  const FailedToLoad();
 }
 
 final class Saving implements State {
