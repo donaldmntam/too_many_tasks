@@ -30,4 +30,6 @@ extension ExtendedResult<T> on Result<T> {
         return result;
     }
   }
+
+  void then(Object? )
 }
