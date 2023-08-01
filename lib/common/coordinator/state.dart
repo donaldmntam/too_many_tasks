@@ -5,7 +5,7 @@ import 'presets_state.dart' as presets;
 class State {
   // TODO: add preset before presets are loaded?
   presets.State presetsState;
-  tasks.State tasksState;
+  tasks.TasksState tasksState;
   final TaskListMasterPort taskListMasterPort;
   TaskListSlavePort taskListSlavePort;
 

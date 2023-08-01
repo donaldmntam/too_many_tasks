@@ -1,8 +1,16 @@
 import 'package:too_many_tasks/common/typedefs/json.dart';
 
-Never badTransition(Object? state, String transition) {
-  throw "Bad transition detected! Transition of '$transition' happened when "
+Never illegalState(Object? state, String function) {
+  throw "Illegal state detected! Function '$function' was called when "
     "the state was '$state'!";
+}
+
+Never todo([String? comment]) {
+  if (comment == null) {
+    throw "TODO";
+  } else {
+    throw "TODO: $comment";
+  }
 }
 
 String jsonErrorMessage(

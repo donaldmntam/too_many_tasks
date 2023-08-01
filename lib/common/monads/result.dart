@@ -1,4 +1,7 @@
-sealed class Result<T> {}
+sealed class Result<T> {
+  const factory Result.ok(T value) = Ok;
+  const factory Result.err(Object? value) = Err;
+}
 
 final class Ok<T> implements Result<T> {
   final T value;
@@ -31,5 +34,10 @@ extension ExtendedResult<T> on Result<T> {
     }
   }
 
-  void then(Object? )
+  R match<R>({required R Function(T) ok, required R Function(Object?) err}) {
+    return switch (this) {
+      Ok(value: final value) => ok(value),
+      Err(value: final value) => err(value),
+    };
+  }
 }

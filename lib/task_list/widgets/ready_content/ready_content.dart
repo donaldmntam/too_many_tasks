@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart' hide State, Theme;
+import 'package:too_many_tasks/common/coordinator/tasks_state.dart';
 import 'package:too_many_tasks/common/functions/list_functions.dart';
 import 'package:too_many_tasks/common/models/task.dart';
 import 'package:too_many_tasks/common/theme/theme.dart';
@@ -13,7 +14,7 @@ const _animationDuration = Duration(milliseconds: 200);
 
 class Content extends StatefulWidget {
   final double fabClearance;
-  final Ready state;
+  final TasksReady state;
   final task_card.Listener listener;
 
   const Content({
@@ -59,6 +60,9 @@ class _ContentState extends widgets.State<Content> {
 
   @override
   Widget build(BuildContext context) {
+    if (widget.state.tasks.isEmpty) {
+      return const SizedBox.shrink();
+    }
     final theme = Theme.of(context);
     final bottomInset = MediaQuery.of(context).padding.bottom;
     return MediaQuery.removePadding(

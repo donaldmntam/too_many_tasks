@@ -26,7 +26,7 @@ class TaskManagerImpl implements TaskManager {
 
   void loadTasks() {
     final state = _state;
-    if (state is! Start) badTransition(state, "loadTasks");
+    if (state is! Start) illegalState(state, "loadTasks");
     const newState = Loading();
     _state = newState;
     _sharedPrefs.getString("tasks").then((string) {
@@ -41,7 +41,7 @@ class TaskManagerImpl implements TaskManager {
 
   void _tasksDidLoad(List<Task> tasks) {
     final state = _state;
-    if (state is! Loading) badTransition(state, "_tasksDidLoad");
+    if (state is! Loading) illegalState(state, "_tasksDidLoad");
     final newState = Ready(tasks: tasks);
     _state = newState;
     _listeners.send(const TasksDidLoad());
@@ -49,7 +49,7 @@ class TaskManagerImpl implements TaskManager {
 
   void _tasksDidFailToLoad(Object? error) {
     final state = _state;
-    if (state is! Loading) badTransition(state, "_tasksDidFailToLoad");
+    if (state is! Loading) illegalState(state, "_tasksDidFailToLoad");
     const newState = FailedToLoad();
     _state = newState;
     _listeners.send(const TasksDidFailToLoad());

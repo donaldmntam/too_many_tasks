@@ -1,39 +1,39 @@
 import 'package:too_many_tasks/common/models/task.dart';
 
-sealed class State {
-  State copy();
+sealed class TasksState {
+  TasksState copy();
 }
 
-final class Start implements State {
-  const Start();
+final class TasksStart implements TasksState {
+  const TasksStart();
 
   @override
-  Start copy() => const Start();
+  TasksStart copy() => const TasksStart();
 }
 
-final class Loading implements State {
-  const Loading();
+final class TasksLoading implements TasksState {
+  const TasksLoading();
 
   @override
-  Loading copy() => const Loading();
+  TasksLoading copy() => const TasksLoading();
 }
 
-final class Ready implements State {
+final class TasksReady implements TasksState {
   final List<Task> tasks;
 
-  const Ready({
+  const TasksReady({
     required this.tasks
   });
 
   @override
-  Ready copy() => Ready(
+  TasksReady copy() => TasksReady(
     tasks: tasks.toList(),
   );
 }
 
-final class FailedToLoad implements State {
-  const FailedToLoad();
+final class TasksFailedToLoad implements TasksState {
+  const TasksFailedToLoad();
 
   @override
-  FailedToLoad copy() => const FailedToLoad();
+  TasksFailedToLoad copy() => const TasksFailedToLoad();
 }

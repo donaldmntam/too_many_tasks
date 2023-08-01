@@ -12,6 +12,12 @@ final class DataInitialized implements MasterMessage {
 
 sealed class SlaveMessage {}
 
+final class AddTask implements SlaveMessage {
+  final Task task;
+
+  const AddTask(this.task);
+}
+
 final class AddPreset implements SlaveMessage {
   final TaskPreset preset;
 

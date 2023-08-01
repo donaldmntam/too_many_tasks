@@ -1,14 +1,12 @@
 import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:too_many_tasks/common/coordinator/tasks_state.dart';
 import 'package:too_many_tasks/common/functions/error_functions.dart';
-import 'package:too_many_tasks/common/functions/scope_functions.dart';
 import 'package:too_many_tasks/common/functions/tasks_functions.dart';
 import 'package:too_many_tasks/common/models/task.dart';
 import 'package:too_many_tasks/common/util_classes/channel/ports.dart';
 import 'package:too_many_tasks/common/widgets/task_dialog/task_dialog.dart';
-import 'package:too_many_tasks/task_list/controller.dart' as task_list;
-import 'package:too_many_tasks/task_list/functions/task_functions.dart';
+import 'package:too_many_tasks/task_list/listener.dart';
 import 'package:too_many_tasks/task_list/models/data.dart';
 import 'package:too_many_tasks/task_list/models/message.dart';
 import 'package:too_many_tasks/task_list/widgets/clipboard.dart';
@@ -45,11 +43,14 @@ class Page extends StatefulWidget {
       ? clipboardOverlapHeight
       : clipboardTopWidgetsHeight;
 
-  final SlavePort<MasterMessage, SlaveMessage> slavePort;
+  // final SlavePort<MasterMessage, SlaveMessage> slavePort;
+  final TasksState tasksState;
+  final PageListener listener;
 
   const Page({
     super.key,
-    required this.slavePort,
+    required this.tasksState,
+    required this.listener,
   });
 
   @override
@@ -57,67 +58,67 @@ class Page extends StatefulWidget {
 }
 
 class _State extends State<Page> implements task_card.Listener {
-  page.State state = const page.Loading();
+  // page.State state = const page.Loading();
   
   @override
   void initState() {
-    widget.slavePort.listen(_onMasterMessage);
+    // widget.slavePort.listen(_onMasterMessage);
     super.initState();
   }
 
   @override
   void onCheckMarkPressed(int index) {
-    final state = this.state;
-    switch (state) {
-      case page.Ready():
-        final newState = state.copy();
-        final task = newState.tasks[index];
-        newState.tasks[index] = task.copy(
-          done: !task.done
-        );
-        this.state = newState;
-        setState(() {});
-      case page.Loading():
-        badTransition(state, "onCheckmarkPressed");
-    }
+    // final state = this.state;
+    // switch (state) {
+    //   case page.Ready():
+    //     final newState = state.copy();
+    //     final task = newState.tasks[index];
+    //     newState.tasks[index] = task.copy(
+    //       done: !task.done
+    //     );
+    //     this.state = newState;
+    //     setState(() {});
+    //   case page.Loading():
+    //     badTransition(state, "onCheckmarkPressed");
+    // }
   }
   
   @override
   void onEditPressed(int index) async {
-    final state = this.state;
-    switch (state) {
-      case page.Ready():
-        final newTask = await showDialog(
-          context: context,
-          builder: (context) => TaskDialog(
-            presets: state.presets.lock,
-            task: state.tasks[index]
-          )
-        ) as Task?;
-        if (newTask == null) break;
-        final newState = state.copy();
-        newState.tasks[index] = newTask;
-        this.state = newState;
-        setState(() {});
-      case page.Loading():
-        badTransition(state, "onEditPressed");
-    }
+    // final state = this.state;
+    // switch (state) {
+    //   case page.Ready():
+    //     final newTask = await showDialog(
+    //       context: context,
+    //       builder: (context) => TaskDialog(
+    //         presets: state.presets.lock,
+    //         task: state.tasks[index]
+    //       )
+    //     ) as Task?;
+    //     if (newTask == null) break;
+    //     final newState = state.copy();
+    //     newState.tasks[index] = newTask;
+    //     this.state = newState;
+    //     setState(() {});
+    //   case page.Loading():
+    //     badTransition(state, "onEditPressed");
+    // }
   }
   
   @override
   void onPinPressed(int index) {
-    final state = this.state;
-    switch (state) {
-      case page.Ready():
-        final newState = state.copy();
-        final taskToPin = newState.tasks[index];
-        final newTask = taskToPin.copy(pinned: !taskToPin.pinned);
-        newState.tasks[index] = newTask;
-        this.state = newState;
-        setState(() {});
-      case page.Loading():
-        badTransition(state, "onPinPressed");
-    }
+    // final state = this.state;
+    // switch (state) {
+    //   case page.Ready():
+    //     final newState = state.copy();
+    //     final taskToPin = newState.tasks[index];
+    //     final newTask = taskToPin.copy(pinned: !taskToPin.pinned);
+    //     newState.tasks[index] = newTask;
+    //     this.state = newState;
+    //     setState(() {});
+    //   case page.Loading():
+    //     badTransition(state, "onPinPressed");
+    // }
   }
 
   @override
@@ -139,17 +140,17 @@ class _State extends State<Page> implements task_card.Listener {
   }
 
   void onDataLoaded(Data data) {
-    final state = this.state;
-    switch (state) {
-      case page.Loading():
-        final newState = page.Ready(
-          tasks: data.tasks.unlock,
-          presets: data.presets.unlock,
-        );
-        setState(() => this.state = newState);
-      case page.Ready():
-        badTransition(state, "dataDidLoad");
-    }
+    // final state = this.state;
+    // switch (state) {
+    //   case page.Loading():
+    //     final newState = page.Ready(
+    //       tasks: data.tasks.unlock,
+    //       presets: data.presets.unlock,
+    //     );
+    //     setState(() => this.state = newState);
+    //   case page.Ready():
+    //     badTransition(state, "dataDidLoad");
+    // }
   }
 
   void _onMasterMessage(MasterMessage message) {
@@ -160,34 +161,38 @@ class _State extends State<Page> implements task_card.Listener {
   }
 
   void _onFabTap() {
-    final state = this.state;
-    switch (state) {
-      case page.Ready():
-        showDialog(
-          context: context,
-          builder: (_) => TaskDialog(task: null, presets: state.presets.lock)
-        ).then((task) => _onAddTask(task));
-      case page.Loading():
-        badTransition(state, "_onFabTap");
-    }
+    showDialog(
+      context: context,
+      builder: (_) => TaskDialog(task: null, presets: <TaskPreset>[].lock)
+    ).then((task) => widget.listener.onAddTask(task));
+    // final state = this.state;
+    // switch (state) {
+    //   case page.Ready():
+    //     showDialog(
+    //       context: context,
+    //       builder: (_) => TaskDialog(task: null, presets: state.presets.lock)
+    //     ).then((task) => _onAddTask(task));
+    //   case page.Loading():
+    //     badTransition(state, "_onFabTap");
+    // }
   }
 
   void _onAddTask(Task task) {
-    final state = this.state;
-    switch (state) {
-      case page.Ready():
-        final newState = state.copy();
-        newState.tasks.add(task);
-        this.state = newState;
-        setState(() {});
-      case page.Loading():
-        badTransition(state, "_onAddTask");
-    }
+    // final state = this.state;
+    // switch (state) {
+    //   case page.Ready():
+    //     final newState = state.copy();
+    //     newState.tasks.add(task);
+    //     this.state = newState;
+    //     setState(() {});
+    //   case page.Loading():
+    //     badTransition(state, "_onAddTask");
+    // }
   }
 
   @override
   Widget build(BuildContext context) {
-    final state = this.state;
+    final tasksState = widget.tasksState;
     return Scaffold(
       body: LayoutBuilder(
         builder: (context, constraints) {
@@ -199,9 +204,11 @@ class _State extends State<Page> implements task_card.Listener {
                   width: double.infinity,
                   height: Page.topHeight(context),
                   child: Top(
-                    progress: switch (state) {
-                      page.Loading() => null,
-                      page.Ready(tasks: final tasks) => tasks.progress,
+                    progress: switch (tasksState) {
+                      TasksStart() => illegalState(tasksState, "build"),
+                      TasksLoading() => null,
+                      TasksReady(tasks: final tasks) => tasks.progress,
+                      TasksFailedToLoad() => todo(),
                     }
                   ),
                 ),
@@ -212,9 +219,10 @@ class _State extends State<Page> implements task_card.Listener {
                   height: constraints.maxHeight 
                     - Page.topHeight(context) 
                     + Page.clipboardOverlapHeight,
-                  topRightChild: switch (state) {
-                    page.Loading() => null,
-                    page.Ready() => Padding(
+                  topRightChild: switch (widget.tasksState) {
+                    TasksStart() => illegalState(widget.tasksState, "build"),
+                    TasksLoading() => null,
+                    TasksReady() => Padding(
                       padding: const EdgeInsets.only(
                         top: 12,
                         left: Page.clipboardBorderRadius,
@@ -226,14 +234,17 @@ class _State extends State<Page> implements task_card.Listener {
                         child: FilterButton()
                       )
                     ),
+                    TasksFailedToLoad() => todo(),
                   },
-                  child: switch (state) {
-                    page.Loading() => loading.Content(state: state),
-                    page.Ready() => ready.Content(
-                      state: state,
+                  child: switch (tasksState) {
+                    TasksStart() => illegalState(widget.tasksState, "build"),
+                    TasksLoading() => const loading.Content(),
+                    TasksReady() => ready.Content(
+                      state: tasksState,
                       listener: this,
                       fabClearance: _fabSize + _fabPadding.bottom,
                     ),
+                    TasksFailedToLoad() => todo(),
                   }
                 ),
               ),
