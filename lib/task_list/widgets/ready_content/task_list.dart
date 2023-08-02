@@ -32,11 +32,12 @@ class TaskList extends StatefulWidget {
 }
 
 class _TaskListState extends widgets.State<TaskList>   
-  with SingleTickerProviderStateMixin 
-  implements task_card.Listener {
+  with SingleTickerProviderStateMixin {
   late final List<task_card.State> cardStates;
 
   late final Ticker ticker;
+  
+  // TODO: intercept listener!
 
   @override
   void initState() {
@@ -59,18 +60,14 @@ class _TaskListState extends widgets.State<TaskList>
 
   @override
   void didUpdateWidget(TaskList oldWidget) {
-    // !! assuming that if the task list length is longer, new tasks have
-    // !! been added to the end of the task array
-    if (widget.tasks.length > oldWidget.tasks.length) {
-      final services = Services.of(context);
-      for (var i = oldWidget.tasks.length; i < widget.tasks.length; i++) {
-        cardStates.add(
-          task_card.BeingAdded(
-            startTime: services.calendar.now(),
-            animationValue: 0
-          )
-        );
-      }
+    final services = Services.of(context);
+    for (var i = oldWidget.tasks.length; i < widget.tasks.length; i++) {
+      cardStates.add(
+        task_card.BeingAdded(
+          startTime: services.calendar.now(),
+          animationValue: 0
+        )
+      );
     }
 
     super.didUpdateWidget(oldWidget);
@@ -111,6 +108,7 @@ class _TaskListState extends widgets.State<TaskList>
           ) / _removeAnimationDuration.inMilliseconds;
           if (animationValue > 1.0) {
             cardStates[i] = const task_card.Removed();
+            widget.listener.onRemove(i);
             setState(() {});
           } else {
             cardStates[i] = task_card.BeingRemoved(
@@ -132,7 +130,7 @@ class _TaskListState extends widgets.State<TaskList>
     widgetBuilders.add(() => const SizedBox(height: taskListPadding));
 
     final pinnedTasksBuilders = 
-      functions.pinnedTasksBuilders(widget.tasks, cardStates, this);
+      functions.pinnedTasksBuilders(widget.tasks, cardStates, widget.listener);
     if (pinnedTasksBuilders.isNotEmpty) {
       widgetBuilders.addAll(pinnedTasksBuilders);
       widgetBuilders.add(() => Padding(
@@ -144,7 +142,7 @@ class _TaskListState extends widgets.State<TaskList>
     }
 
     widgetBuilders.addAll(
-      functions.unpinnedTasksBuilders(widget.tasks, cardStates, this)
+      functions.unpinnedTasksBuilders(widget.tasks, cardStates, widget.listener)
     );
     
     widgetBuilders.add(
@@ -161,24 +159,19 @@ class _TaskListState extends widgets.State<TaskList>
     );
   }
   
-  @override
   void onCheckMarkPressed(int index) {
     widget.listener.onCheckMarkPressed(index);
   }
   
-  @override
   void onEditPressed(int index) {
     widget.listener.onEditPressed(index);
   }
   
-  @override
   void onPinPressed(int index) {
     widget.listener.onPinPressed(index);
   }
   
-  @override
   void onRemove(int index) {
-    // widget.listener.onRemove(index);
     final cardState = cardStates[index];
     switch (cardState) {
       case task_card.Ready():

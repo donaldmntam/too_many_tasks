@@ -66,19 +66,19 @@ class _WidgetState extends flutter.State<Coordinator> {
     final state = _state;
     final tasksState = state.tasksState;
     if (tasksState is! tasks.TasksLoading) illegalState(state, "_tasksDidLoad");
-    final newTasksState = tasks.TasksReady(tasks: loadedTasks);
-    // final newTasksState = tasks.TasksReady(
-    //   tasks: [
-    //     (name: "Task 1", dueDate: DateTime.now(), done: false, pinned: false),
-    //     (name: "Task 2", dueDate: DateTime.now(), done: false, pinned: false),
-    //     (name: "Task 3", dueDate: DateTime.now(), done: false, pinned: false),
-    //     (name: "Task 4", dueDate: DateTime.now(), done: false, pinned: false),
-    //     (name: "Task 5", dueDate: DateTime.now(), done: false, pinned: false),
-    //     (name: "Task 6", dueDate: DateTime.now(), done: false, pinned: false),
-    //     (name: "Task 7", dueDate: DateTime.now(), done: false, pinned: false),
-    //     (name: "Task 8", dueDate: DateTime.now(), done: false, pinned: false),
-    //   ]
-    // );
+    // final newTasksState = tasks.TasksReady(tasks: loadedTasks);
+    final newTasksState = tasks.TasksReady(
+      tasks: [
+        (name: "Task 1", dueDate: DateTime.now(), done: false, pinned: false),
+        (name: "Task 2", dueDate: DateTime.now(), done: false, pinned: false),
+        (name: "Task 3", dueDate: DateTime.now(), done: false, pinned: false),
+        (name: "Task 4", dueDate: DateTime.now(), done: false, pinned: false),
+        (name: "Task 5", dueDate: DateTime.now(), done: false, pinned: false),
+        (name: "Task 6", dueDate: DateTime.now(), done: false, pinned: false),
+        (name: "Task 7", dueDate: DateTime.now(), done: false, pinned: false),
+        (name: "Task 8", dueDate: DateTime.now(), done: false, pinned: false),
+      ]
+    );
     final newState = state.copy();
     newState.tasksState = newTasksState;
     _state = newState;
@@ -157,6 +157,22 @@ class _WidgetState extends flutter.State<Coordinator> {
     setState(() {});
   }
 
+  void _editTask(int index, Task task) {
+
+  }
+
+  void _removeTask(int index) {
+
+  }
+
+  void _checkTask(int index) {
+
+  }
+
+  void _pinTask(int index) {
+
+  }
+
   @override
   flutter.Widget build(flutter.BuildContext context) {
     return task_list.Page(
@@ -164,6 +180,10 @@ class _WidgetState extends flutter.State<Coordinator> {
       tasksState: _state.tasksState,
       listener: (
         onAddTask: _addTask,
+        onEditTask: _editTask,
+        onRemoveTask: _removeTask,
+        onCheckTask: _checkTask,
+        onPinTask: _pinTask,
       ),
     );
   }

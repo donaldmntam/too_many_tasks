@@ -15,12 +15,12 @@ const _headerWidth = 32.0;
 final _borderRadius = BorderRadius.circular(12);
 const _padding = EdgeInsets.all(14);
 
-abstract interface class Listener {
-  void onPinPressed(int index);
-  void onEditPressed(int index);
-  void onCheckMarkPressed(int index);
-  void onRemove(int index);
-}
+typedef Listener = ({
+  void Function(int index) onPinPressed,
+  void Function(int index) onEditPressed,
+  void Function(int index) onCheckMarkPressed,
+  void Function(int index) onRemove,
+});
 
 class TaskCard extends StatelessWidget {
   final int index;

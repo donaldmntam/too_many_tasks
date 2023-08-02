@@ -13,6 +13,7 @@ import 'package:too_many_tasks/task_list/widgets/clipboard.dart';
 import 'package:too_many_tasks/task_list/widgets/filter_button.dart';
 import 'package:too_many_tasks/task_list/widgets/task_card/task_card.dart' as task_card;
 import 'package:too_many_tasks/task_list/widgets/top/top.dart';
+import 'functions/task_functions.dart';
 import 'state.dart' as page;
 import 'widgets/ready_content/ready_content.dart' as ready;
 import './widgets/loading_content.dart'as loading;
@@ -57,7 +58,7 @@ class Page extends StatefulWidget {
   State<Page> createState() => _State();
 }
 
-class _State extends State<Page> implements task_card.Listener {
+class _State extends State<Page> {
   // page.State state = const page.Loading();
   
   @override
@@ -123,19 +124,16 @@ class _State extends State<Page> implements task_card.Listener {
 
   @override
   void onRemove(int index) {
-    // final state = this.state;
-    // switch (state) {
-    //   case page.Ready():
-    //     final newState = state.copy();
-    //     if (taskIsPinned(index: index, pinnedCount: state.pinnedCount)) {
-    //       newState.pinnedCount--;
-    //     }
-    //     print("removing at $index from list of length ${newState.tasks.length}");
-    //     newState.tasks.removeAt(index);
-    //     this.state = newState;
+    widget.listener.onRemoveTask(index);
+    // final tasksState = widget.tasksState;
+    // switch (tasksState) {
+    //   case TasksReady():
+    //     // final newTasksState = tasksState.copy();
+    //     // newTasksState.tasks.removeAt(index);
+    //     // this.state = newTasksState;
     //     setState(() {});
     //   case page.Loading():
-    //     badTransition(state, "onRemove");
+    //     badTransition(tasksState, "onRemove");
     // }
   }
 
@@ -241,7 +239,12 @@ class _State extends State<Page> implements task_card.Listener {
                     TasksLoading() => const loading.Content(),
                     TasksReady() => ready.Content(
                       state: tasksState,
-                      listener: this,
+                      listener: (
+                        onRemove: widget.listener.onRemoveTask,
+                        onCheckMarkPressed: (_) {},
+                        onEditPressed: (_) {},
+                        onPinPressed: (_) {},
+                      ),
                       fabClearance: _fabSize + _fabPadding.bottom,
                     ),
                     TasksFailedToLoad() => todo(),
