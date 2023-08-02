@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart' hide State, Theme;
 import 'package:too_many_tasks/common/coordinator/tasks_state.dart';
-import 'package:too_many_tasks/common/functions/list_functions.dart';
-import 'package:too_many_tasks/common/models/task.dart';
 import 'package:too_many_tasks/common/theme/theme.dart';
-import 'package:too_many_tasks/task_list/state.dart';
 import 'package:too_many_tasks/task_list/widgets/ready_content/task_list.dart';
 import '../task_card/task_card.dart' as task_card;
 import 'package:flutter/widgets.dart' as widgets show State;
@@ -60,9 +57,6 @@ class _ContentState extends widgets.State<Content> {
 
   @override
   Widget build(BuildContext context) {
-    if (widget.state.tasks.isEmpty) {
-      return const SizedBox.shrink();
-    }
     final theme = Theme.of(context);
     final bottomInset = MediaQuery.of(context).padding.bottom;
     return MediaQuery.removePadding(
