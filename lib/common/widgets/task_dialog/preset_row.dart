@@ -1,6 +1,6 @@
 import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:flutter/material.dart' hide Theme;
-import 'package:too_many_tasks/common/models/task.dart';
+import 'package:too_many_tasks/common/models/task_preset.dart';
 import 'package:too_many_tasks/common/theme/theme.dart';
 import 'package:too_many_tasks/common/widgets/tappable/tappable.dart';
 
@@ -9,7 +9,7 @@ import 'constants.dart';
 const _padding = EdgeInsets.symmetric(horizontal: 10, vertical: 8);
 
 class PresetRow extends StatelessWidget {
-  final IList<TaskPreset> presets;
+  final TaskPresets presets;
   final void Function(TaskPreset) onPressed;
 
   const PresetRow({

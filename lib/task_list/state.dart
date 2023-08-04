@@ -1,24 +1,26 @@
 import 'package:too_many_tasks/common/models/task.dart';
+import 'package:too_many_tasks/common/models/task_preset.dart';
 
 sealed class State {}
 
-class Loading implements State {
+final class Loading implements State {
   const Loading();
-
-  Loading copy() => const Loading(); 
 }
 
-class Ready implements State {
-  final List<TaskPreset> presets;
-  final List<Task> tasks;
+final class Ready implements State {
+  final TaskPresets presets;
+  final Tasks tasks;
 
-  Ready({
+  const Ready({
     required this.presets,
     required this.tasks,
   });
 
-  Ready copy() => Ready(
-    presets: presets,
-    tasks: tasks.toList(growable: true),
+  Ready copy({
+    TaskPresets? presets,
+    Tasks? tasks,
+  }) => Ready(
+    presets: presets ?? this.presets,
+    tasks: tasks ?? this.tasks,
   );
 }

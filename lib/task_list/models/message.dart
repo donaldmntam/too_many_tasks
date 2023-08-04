@@ -1,5 +1,5 @@
-import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:too_many_tasks/common/models/task.dart';
+import 'package:too_many_tasks/common/models/task_preset.dart';
 import 'package:too_many_tasks/task_list/models/data.dart';
 
 sealed class MasterMessage {}

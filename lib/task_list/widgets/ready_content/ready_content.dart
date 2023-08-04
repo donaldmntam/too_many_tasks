@@ -1,5 +1,6 @@
+import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:flutter/material.dart' hide State, Theme;
-import 'package:too_many_tasks/common/coordinator/tasks_state.dart';
+import 'package:too_many_tasks/common/models/task.dart';
 import 'package:too_many_tasks/common/theme/theme.dart';
 import 'package:too_many_tasks/task_list/widgets/ready_content/task_list.dart';
 import '../task_card/task_card.dart' as task_card;
@@ -11,13 +12,13 @@ const _animationDuration = Duration(milliseconds: 200);
 
 class Content extends StatefulWidget {
   final double fabClearance;
-  final TasksReady state;
+  final IList<Task> tasks;
   final task_card.Listener listener;
 
   const Content({
     super.key,
     required this.fabClearance,
-    required this.state,
+    required this.tasks,
     required this.listener
   });
 
@@ -79,7 +80,7 @@ class _ContentState extends widgets.State<Content> {
               Flexible(
                 flex: 1,
                 child: TaskList(
-                  tasks: widget.state.tasks,
+                  tasks: widget.tasks,
                   bottomPadding: bottomInset + widget.fabClearance, 
                   listener: widget.listener,
                   scrollController: controller

@@ -1,17 +1,14 @@
 import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:flutter/material.dart' as flutter;
 import 'package:too_many_tasks/common/functions/error_functions.dart';
-import 'package:too_many_tasks/common/functions/json_functions.dart';
+import 'package:too_many_tasks/common/models/loadable.dart';
 import 'package:too_many_tasks/common/models/task.dart';
 import 'package:too_many_tasks/common/monads/result.dart';
 import 'package:too_many_tasks/common/services/shared_preferences.dart';
-import 'package:too_many_tasks/common/util_classes/channel/ports.dart';
 import 'package:too_many_tasks/task_list/models/message.dart' as task_list;
 import 'package:too_many_tasks/task_list/page.dart' as task_list;
 import 'functions.dart';
 import 'state.dart';
-import 'tasks_state.dart' as tasks;
-import 'presets_state.dart' as presets;
 
 class Coordinator extends flutter.StatefulWidget {
   final SharedPreferences _sharedPrefs;
@@ -36,13 +33,9 @@ class _WidgetState extends flutter.State<Coordinator> {
 
   @override
   void initState() {
-    final (taskListMasterPort, taskListSlavePort) =
-      ports<task_list.MasterMessage, task_list.SlaveMessage>();
-    _state = State(
-      presetsState: const presets.Start(),
-      tasksState: const tasks.TasksStart(),
-      taskListMasterPort: taskListMasterPort,
-      taskListSlavePort: taskListSlavePort,
+    _state = const State(
+      taskPresets: Loading(),
+      tasks: Loading(),
     );
     super.initState();
     _loadTasks();
@@ -50,12 +43,8 @@ class _WidgetState extends flutter.State<Coordinator> {
 
   void _loadTasks() async {
     final state = _state;
-    final tasksState = state.tasksState;
-    if (tasksState is! tasks.TasksStart) illegalState(state, "_loadTasks");
-    const newTasksState = tasks.TasksLoading();
-    final newState = state.copy();
-    newState.tasksState = newTasksState;
-    _state = newState;
+    final tasksState = state.tasks;
+    if (tasksState is! Loading) illegalState(state, "_loadTasks");
     (await loadTasksFromSharedPrefs(widget._sharedPrefs)).match(
       ok: _tasksDidLoad,
       err: _tasksDidFailToLoad
@@ -64,11 +53,11 @@ class _WidgetState extends flutter.State<Coordinator> {
   
   void _tasksDidLoad(List<Task> loadedTasks) {
     final state = _state;
-    final tasksState = state.tasksState;
-    if (tasksState is! tasks.TasksLoading) illegalState(state, "_tasksDidLoad");
+    final tasks = state.tasks;
+    if (tasks is! Loading) illegalState(state, "_tasksDidLoad");
     // final newTasksState = tasks.TasksReady(tasks: loadedTasks);
-    final newTasksState = tasks.TasksReady(
-      tasks: [
+    final newTasks = Ready(
+      [
         (name: "Task 1", dueDate: DateTime.now(), done: false, pinned: false),
         (name: "Task 2", dueDate: DateTime.now(), done: false, pinned: false),
         (name: "Task 3", dueDate: DateTime.now(), done: false, pinned: false),
@@ -77,23 +66,25 @@ class _WidgetState extends flutter.State<Coordinator> {
         (name: "Task 6", dueDate: DateTime.now(), done: false, pinned: false),
         (name: "Task 7", dueDate: DateTime.now(), done: false, pinned: false),
         (name: "Task 8", dueDate: DateTime.now(), done: false, pinned: false),
-      ]
+      ].lock
     );
-    final newState = state.copy();
-    newState.tasksState = newTasksState;
+    final newState = state.copy(
+      tasks: newTasks,
+    );
     _state = newState;
     setState(() {});
   }
 
   void _tasksDidFailToLoad(Object? error) {
     final state = _state;
-    final tasksState = state.tasksState;
-    if (tasksState is! tasks.TasksLoading) {
+    final tasks = state.tasks;
+    if (tasks is! Loading) {
       illegalState(state, "_tasksDidFailToLoad");
     }
-    const newTasksState = tasks.TasksFailedToLoad();
-    final newState = state.copy();
-    newState.tasksState = newTasksState;
+    final newTasks = Error(error);
+    final newState = state.copy(
+      tasks: newTasks,
+    );    
     _state = newState;
     setState(() {});
   }
@@ -147,18 +138,24 @@ class _WidgetState extends flutter.State<Coordinator> {
 
   void _addTask(Task task) {
     final state = _state;
-    final tasksState = state.tasksState;
-    if (tasksState is! tasks.TasksReady) illegalState(state, "_addTask");
-    final newTasksState = tasksState.copy();
-    newTasksState.tasks.add(task);
-    final newState = state.copy();
-    newState.tasksState = newTasksState;
+    final tasks = state.tasks; 
+    if (tasks is! Ready<Tasks>) illegalState(state, "_addTask");
+    final newState = state.copy(
+      tasks: tasks.copy(tasks.value.add(task)),
+    );
     _state = newState;
     setState(() {});
   }
 
   void _editTask(int index, Task task) {
-
+    final state = _state;
+    final tasks = state.tasks;
+    if (tasks is! Ready<Tasks>) illegalState(state, "_editTask");
+    final newState = state.copy(
+      tasks: tasks.copy(tasks.value.replace(index, task)),
+    );
+    _state = newState;
+    setState(() {});
   }
 
   void _removeTask(int index) {
@@ -177,7 +174,7 @@ class _WidgetState extends flutter.State<Coordinator> {
   flutter.Widget build(flutter.BuildContext context) {
     return task_list.Page(
       // slavePort: _state.taskListSlavePort,
-      tasksState: _state.tasksState,
+      tasks: _state.tasks,
       listener: (
         onAddTask: _addTask,
         onEditTask: _editTask,

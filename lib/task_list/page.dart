@@ -1,20 +1,14 @@
 import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:flutter/material.dart';
-import 'package:too_many_tasks/common/coordinator/tasks_state.dart';
 import 'package:too_many_tasks/common/functions/error_functions.dart';
 import 'package:too_many_tasks/common/functions/tasks_functions.dart';
 import 'package:too_many_tasks/common/models/task.dart';
-import 'package:too_many_tasks/common/util_classes/channel/ports.dart';
 import 'package:too_many_tasks/common/widgets/task_dialog/task_dialog.dart';
 import 'package:too_many_tasks/task_list/listener.dart';
-import 'package:too_many_tasks/task_list/models/data.dart';
-import 'package:too_many_tasks/task_list/models/message.dart';
 import 'package:too_many_tasks/task_list/widgets/clipboard.dart';
 import 'package:too_many_tasks/task_list/widgets/filter_button.dart';
-import 'package:too_many_tasks/task_list/widgets/task_card/task_card.dart' as task_card;
 import 'package:too_many_tasks/task_list/widgets/top/top.dart';
-import 'functions/task_functions.dart';
-import 'state.dart' as page;
+import '../common/models/loadable.dart';
 import 'widgets/ready_content/ready_content.dart' as ready;
 import './widgets/loading_content.dart'as loading;
 
@@ -44,13 +38,12 @@ class Page extends StatefulWidget {
       ? clipboardOverlapHeight
       : clipboardTopWidgetsHeight;
 
-  // final SlavePort<MasterMessage, SlaveMessage> slavePort;
-  final TasksState tasksState;
+  final Loadable<Tasks> tasks;
   final PageListener listener;
 
   const Page({
     super.key,
-    required this.tasksState,
+    required this.tasks,
     required this.listener,
   });
 
@@ -59,138 +52,21 @@ class Page extends StatefulWidget {
 }
 
 class _State extends State<Page> {
-  // page.State state = const page.Loading();
-  
-  @override
+    @override
   void initState() {
-    // widget.slavePort.listen(_onMasterMessage);
     super.initState();
-  }
-
-  @override
-  void onCheckMarkPressed(int index) {
-    // final state = this.state;
-    // switch (state) {
-    //   case page.Ready():
-    //     final newState = state.copy();
-    //     final task = newState.tasks[index];
-    //     newState.tasks[index] = task.copy(
-    //       done: !task.done
-    //     );
-    //     this.state = newState;
-    //     setState(() {});
-    //   case page.Loading():
-    //     badTransition(state, "onCheckmarkPressed");
-    // }
-  }
-  
-  @override
-  void onEditPressed(int index) async {
-    // final state = this.state;
-    // switch (state) {
-    //   case page.Ready():
-    //     final newTask = await showDialog(
-    //       context: context,
-    //       builder: (context) => TaskDialog(
-    //         presets: state.presets.lock,
-    //         task: state.tasks[index]
-    //       )
-    //     ) as Task?;
-    //     if (newTask == null) break;
-    //     final newState = state.copy();
-    //     newState.tasks[index] = newTask;
-    //     this.state = newState;
-    //     setState(() {});
-    //   case page.Loading():
-    //     badTransition(state, "onEditPressed");
-    // }
-  }
-  
-  @override
-  void onPinPressed(int index) {
-    // final state = this.state;
-    // switch (state) {
-    //   case page.Ready():
-    //     final newState = state.copy();
-    //     final taskToPin = newState.tasks[index];
-    //     final newTask = taskToPin.copy(pinned: !taskToPin.pinned);
-    //     newState.tasks[index] = newTask;
-    //     this.state = newState;
-    //     setState(() {});
-    //   case page.Loading():
-    //     badTransition(state, "onPinPressed");
-    // }
-  }
-
-  @override
-  void onRemove(int index) {
-    widget.listener.onRemoveTask(index);
-    // final tasksState = widget.tasksState;
-    // switch (tasksState) {
-    //   case TasksReady():
-    //     // final newTasksState = tasksState.copy();
-    //     // newTasksState.tasks.removeAt(index);
-    //     // this.state = newTasksState;
-    //     setState(() {});
-    //   case page.Loading():
-    //     badTransition(tasksState, "onRemove");
-    // }
-  }
-
-  void onDataLoaded(Data data) {
-    // final state = this.state;
-    // switch (state) {
-    //   case page.Loading():
-    //     final newState = page.Ready(
-    //       tasks: data.tasks.unlock,
-    //       presets: data.presets.unlock,
-    //     );
-    //     setState(() => this.state = newState);
-    //   case page.Ready():
-    //     badTransition(state, "dataDidLoad");
-    // }
-  }
-
-  void _onMasterMessage(MasterMessage message) {
-    switch (message) {
-      case DataInitialized(data: final data):
-        onDataLoaded(data);
-    }
   }
 
   void _onFabTap() {
     showDialog(
       context: context,
-      builder: (_) => TaskDialog(task: null, presets: <TaskPreset>[].lock)
+      builder: (_) => const TaskDialog(task: null, presets: IListConst([]))
     ).then((task) => widget.listener.onAddTask(task));
-    // final state = this.state;
-    // switch (state) {
-    //   case page.Ready():
-    //     showDialog(
-    //       context: context,
-    //       builder: (_) => TaskDialog(task: null, presets: state.presets.lock)
-    //     ).then((task) => _onAddTask(task));
-    //   case page.Loading():
-    //     badTransition(state, "_onFabTap");
-    // }
-  }
-
-  void _onAddTask(Task task) {
-    // final state = this.state;
-    // switch (state) {
-    //   case page.Ready():
-    //     final newState = state.copy();
-    //     newState.tasks.add(task);
-    //     this.state = newState;
-    //     setState(() {});
-    //   case page.Loading():
-    //     badTransition(state, "_onAddTask");
-    // }
   }
 
   @override
   Widget build(BuildContext context) {
-    final tasksState = widget.tasksState;
+    final tasks = widget.tasks;
     return Scaffold(
       body: LayoutBuilder(
         builder: (context, constraints) {
@@ -202,11 +78,10 @@ class _State extends State<Page> {
                   width: double.infinity,
                   height: Page.topHeight(context),
                   child: Top(
-                    progress: switch (tasksState) {
-                      TasksStart() => illegalState(tasksState, "build"),
-                      TasksLoading() => null,
-                      TasksReady(tasks: final tasks) => tasks.progress,
-                      TasksFailedToLoad() => todo(),
+                    progress: switch (tasks) {
+                      Loading() => null,
+                      Ready(value: final tasks) => tasks.progress,
+                      Error() => todo(),
                     }
                   ),
                 ),
@@ -217,10 +92,9 @@ class _State extends State<Page> {
                   height: constraints.maxHeight 
                     - Page.topHeight(context) 
                     + Page.clipboardOverlapHeight,
-                  topRightChild: switch (widget.tasksState) {
-                    TasksStart() => illegalState(widget.tasksState, "build"),
-                    TasksLoading() => null,
-                    TasksReady() => Padding(
+                  topRightChild: switch (tasks) {
+                    Loading() => null,
+                    Ready() => Padding(
                       padding: const EdgeInsets.only(
                         top: 12,
                         left: Page.clipboardBorderRadius,
@@ -232,13 +106,12 @@ class _State extends State<Page> {
                         child: FilterButton()
                       )
                     ),
-                    TasksFailedToLoad() => todo(),
+                    Error() => todo(),
                   },
-                  child: switch (tasksState) {
-                    TasksStart() => illegalState(widget.tasksState, "build"),
-                    TasksLoading() => const loading.Content(),
-                    TasksReady() => ready.Content(
-                      state: tasksState,
+                  child: switch (tasks) {
+                    Loading() => const loading.Content(),
+                    Ready(value: final tasks) => ready.Content(
+                      tasks: tasks,
                       listener: (
                         onRemove: widget.listener.onRemoveTask,
                         onCheckMarkPressed: (_) {},
@@ -247,7 +120,7 @@ class _State extends State<Page> {
                       ),
                       fabClearance: _fabSize + _fabPadding.bottom,
                     ),
-                    TasksFailedToLoad() => todo(),
+                    Error() => todo(),
                   }
                 ),
               ),

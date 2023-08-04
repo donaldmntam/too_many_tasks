@@ -1,3 +1,4 @@
+import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:too_many_tasks/common/functions/error_functions.dart';
 import 'package:too_many_tasks/common/monads/result.dart';
 import 'package:too_many_tasks/common/typedefs/json.dart';
@@ -8,6 +9,8 @@ typedef Task = ({
   bool done,
   bool pinned,
 });
+
+typedef Tasks = IList<Task>;
 
 extension ExtendedTask on Task {
   Task copy({
@@ -65,7 +68,3 @@ Result<List<Task>> tasksFromJson(Json json) {
   }
   return Ok(tasks);
 }
-
-typedef TaskPreset = ({
-  String name,
-});

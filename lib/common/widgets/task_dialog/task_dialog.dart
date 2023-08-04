@@ -2,6 +2,7 @@ import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:flutter/material.dart' hide Dialog, Theme, TextButton;
 import 'package:too_many_tasks/common/functions/date_functions.dart';
 import 'package:too_many_tasks/common/models/task.dart';
+import 'package:too_many_tasks/common/models/task_preset.dart';
 import 'package:too_many_tasks/common/services/services.dart';
 import 'package:too_many_tasks/common/theme/theme.dart';
 import 'package:too_many_tasks/common/widgets/button/style.dart';
@@ -27,7 +28,7 @@ TextStyle _fieldTextStyle(Theme theme) {
 
 class TaskDialog extends StatefulWidget {
   final Task? task;
-  final IList<TaskPreset> presets;
+  final TaskPresets presets;
 
   const TaskDialog({
     super.key,

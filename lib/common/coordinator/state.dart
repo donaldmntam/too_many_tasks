@@ -1,41 +1,22 @@
 import 'package:too_many_tasks/common/coordinator/typedefs.dart';
-import 'tasks_state.dart' as tasks;
-import 'presets_state.dart' as presets;
+import 'package:too_many_tasks/common/models/loadable.dart';
+import 'package:too_many_tasks/common/models/task.dart';
+import 'package:too_many_tasks/common/models/task_preset.dart';
 
 class State {
-  // TODO: add preset before presets are loaded?
-  presets.State presetsState;
-  tasks.TasksState tasksState;
-  final TaskListMasterPort taskListMasterPort;
-  TaskListSlavePort taskListSlavePort;
+  final Loadable<TaskPresets> taskPresets;
+  final Loadable<Tasks> tasks;
 
-  State({
-    required this.presetsState,
-    required this.tasksState,
-    required this.taskListMasterPort,
-    required this.taskListSlavePort,
+  const State({
+    required this.taskPresets,
+    required this.tasks,
   });
 
-  State copy() => State(
-    presetsState: presetsState.copy(),
-    tasksState: tasksState.copy(),
-    taskListMasterPort: taskListMasterPort,
-    taskListSlavePort: taskListSlavePort,
+  State copy({
+    Loadable<TaskPresets>? taskPresets,
+    Loadable<Tasks>? tasks,
+  }) => State(
+    taskPresets: taskPresets ?? this.taskPresets,
+    tasks: tasks ?? this.tasks,
   );
 }
-
-sealed class Page {
-  Page copy();
-}
-
-// class TaskListPage implements Page {
-
-//   TaskListPage(
-//     this.controller,
-//   );
-
-//   @override
-//   TaskListPage copy() => TaskListPage(
-//     controller,
-//   );
-// }

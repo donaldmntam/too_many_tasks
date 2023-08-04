@@ -1,3 +1,4 @@
+import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:flutter/widgets.dart';
 import 'package:too_many_tasks/common/functions/number_functions.dart';
 import 'package:too_many_tasks/common/models/task.dart';
@@ -12,7 +13,7 @@ enum _TaskType {
 }
 
 List<Widget Function()> pinnedTasksBuilders(
-  List<Task> tasks,
+  IList<Task> tasks,
   List<task_card.State> cardStates,
   task_card.Listener listener,
 ) => _taskBuilders(
@@ -23,7 +24,7 @@ List<Widget Function()> pinnedTasksBuilders(
 );
 
 List<Widget Function()> unpinnedTasksBuilders(
-  List<Task> tasks,
+  IList<Task> tasks,
   List<task_card.State> cardStates,
   task_card.Listener listener,
 ) => _taskBuilders(
@@ -35,7 +36,7 @@ List<Widget Function()> unpinnedTasksBuilders(
 
 List<Widget Function()> _taskBuilders(
   _TaskType type,
-  List<Task> tasks,
+  IList<Task> tasks,
   List<task_card.State> cardStates,
   task_card.Listener listener,
 ) {

@@ -1,3 +1,4 @@
+import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:flutter/material.dart' hide State, Theme;
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart' as widgets show State;
@@ -14,7 +15,7 @@ const _addAnimationDuration = Duration(milliseconds: 500);
 const _removeAnimationDuration = Duration(milliseconds: 500);
 
 class TaskList extends StatefulWidget {
-  final List<Task> tasks;
+  final IList<Task> tasks;
   final double bottomPadding;
   final task_card.Listener listener;
   final ScrollController scrollController;
