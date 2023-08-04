@@ -112,12 +112,7 @@ class _State extends State<Page> {
                     Loading() => const loading.Content(),
                     Ready(value: final tasks) => ready.Content(
                       tasks: tasks,
-                      listener: (
-                        onRemove: widget.listener.onRemoveTask,
-                        onCheckMarkPressed: (_) {},
-                        onEditPressed: (_) {},
-                        onPinPressed: (_) {},
-                      ),
+                      listener: widget.listener,
                       fabClearance: _fabSize + _fabPadding.bottom,
                     ),
                     Error() => todo(),
