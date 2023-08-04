@@ -159,21 +159,45 @@ class _WidgetState extends flutter.State<Coordinator> {
   }
 
   void _removeTask(int index) {
-
+    final state = _state;
+    final tasks = state.tasks;
+    if (tasks is! Ready<Tasks>) illegalState(state, "_removeTask");
+    final newState = state.copy(
+      tasks: tasks.copy(tasks.value.removeAt(index)),
+    );
+    _state = newState;
+    setState(() {});
   }
 
   void _checkTask(int index) {
-
+    final state = _state;
+    final tasks = state.tasks;
+    if (tasks is! Ready<Tasks>) illegalState(state, "_checkTask");
+    final target = tasks.value[index];
+    final replacement = target.copy(done: !target.done);
+    final newState = state.copy(
+      tasks: tasks.copy(tasks.value.replace(index, replacement)),
+    );
+    _state = newState;
+    setState(() {});
   }
 
   void _pinTask(int index) {
-
+    final state = _state;
+    final tasks = state.tasks;
+    if (tasks is! Ready<Tasks>) illegalState(state, "_checkTask");
+    final target = tasks.value[index];
+    final replacement = target.copy(pinned: !target.pinned);
+    final newState = state.copy(
+      tasks: tasks.copy(tasks.value.replace(index, replacement)),
+    );
+    _state = newState;
+    setState(() {});
   }
 
   @override
   flutter.Widget build(flutter.BuildContext context) {
     return task_list.Page(
-      // slavePort: _state.taskListSlavePort,
       tasks: _state.tasks,
       listener: (
         onAddTask: _addTask,

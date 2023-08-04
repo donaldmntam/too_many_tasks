@@ -2,6 +2,7 @@ import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:flutter/material.dart' hide State, Theme;
 import 'package:too_many_tasks/common/models/task.dart';
 import 'package:too_many_tasks/common/theme/theme.dart';
+import 'package:too_many_tasks/task_list/listener.dart';
 import 'package:too_many_tasks/task_list/widgets/ready_content/task_list.dart';
 import '../task_card/task_card.dart' as task_card;
 import 'package:flutter/widgets.dart' as widgets show State;
@@ -13,7 +14,7 @@ const _animationDuration = Duration(milliseconds: 200);
 class Content extends StatefulWidget {
   final double fabClearance;
   final IList<Task> tasks;
-  final task_card.Listener listener;
+  final PageListener listener;
 
   const Content({
     super.key,

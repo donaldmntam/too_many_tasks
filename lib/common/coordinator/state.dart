@@ -1,4 +1,3 @@
-import 'package:too_many_tasks/common/coordinator/typedefs.dart';
 import 'package:too_many_tasks/common/models/loadable.dart';
 import 'package:too_many_tasks/common/models/task.dart';
 import 'package:too_many_tasks/common/models/task_preset.dart';

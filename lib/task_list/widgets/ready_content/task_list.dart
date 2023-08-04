@@ -8,6 +8,7 @@ import 'package:too_many_tasks/common/services/services.dart';
 import 'package:too_many_tasks/common/theme/theme.dart';
 import 'package:too_many_tasks/task_list/data/widget_data.dart';
 import 'package:too_many_tasks/task_list/functions/widget_functions.dart' as functions;
+import 'package:too_many_tasks/task_list/listener.dart';
 import 'package:too_many_tasks/task_list/widgets/task_card/task_card.dart' as task_card;
 import 'package:too_many_tasks/task_list/widgets/task_card/state.dart' as task_card;
 
@@ -17,7 +18,7 @@ const _removeAnimationDuration = Duration(milliseconds: 500);
 class TaskList extends StatefulWidget {
   final IList<Task> tasks;
   final double bottomPadding;
-  final task_card.Listener listener;
+  final PageListener listener;
   final ScrollController scrollController;
 
   const TaskList({
@@ -107,7 +108,7 @@ class _TaskListState extends widgets.State<TaskList>
           ) / _removeAnimationDuration.inMilliseconds;
           if (animationValue > 1.0) {
             cardStates[i] = const task_card.Removed();
-            widget.listener.onRemove(i);
+            widget.listener.onRemoveTask(i);
             setState(() {});
           } else {
             cardStates[i] = task_card.BeingRemoved(
@@ -132,7 +133,11 @@ class _TaskListState extends widgets.State<TaskList>
       functions.pinnedTasksBuilders(
         widget.tasks,
         cardStates,
-        widget.listener.copy(onRemove: onRemove),
+        // task_card.listener
+        (
+          onCheckMarkPressed: widget.listener.onCheckTask,
+        )
+        widget.listener.copy(onRemoveTask: onRemove),
       );
     if (pinnedTasksBuilders.isNotEmpty) {
       widgetBuilders.addAll(pinnedTasksBuilders);
