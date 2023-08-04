@@ -22,6 +22,20 @@ typedef Listener = ({
   void Function(int index) onRemove,
 });
 
+extension ExtendedListener on Listener {
+  Listener copy({
+    void Function(int index)? onPinPressed,
+    void Function(int index)? onEditPressed,
+    void Function(int index)? onCheckMarkPressed,
+    void Function(int index)? onRemove,
+  }) => (
+    onPinPressed: onPinPressed ?? this.onPinPressed,
+    onEditPressed: onEditPressed ?? this.onEditPressed,
+    onCheckMarkPressed: onCheckMarkPressed ?? this.onCheckMarkPressed,
+    onRemove: onRemove ?? this.onRemove,
+  );
+}
+
 class TaskCard extends StatelessWidget {
   final int index;
   final Task task;

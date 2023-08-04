@@ -37,8 +37,6 @@ class _TaskListState extends widgets.State<TaskList>
 
   late final Ticker ticker;
   
-  // TODO: intercept listener!
-
   @override
   void initState() {
     cardStates = widget.tasks.mapIndexed<task_card.State>((task, index) {
@@ -130,7 +128,11 @@ class _TaskListState extends widgets.State<TaskList>
     widgetBuilders.add(() => const SizedBox(height: taskListPadding));
 
     final pinnedTasksBuilders = 
-      functions.pinnedTasksBuilders(widget.tasks, cardStates, widget.listener);
+      functions.pinnedTasksBuilders(
+        widget.tasks,
+        cardStates,
+        widget.listener.copy(onRemove: onRemove),
+      );
     if (pinnedTasksBuilders.isNotEmpty) {
       widgetBuilders.addAll(pinnedTasksBuilders);
       widgetBuilders.add(() => Padding(
@@ -142,7 +144,11 @@ class _TaskListState extends widgets.State<TaskList>
     }
 
     widgetBuilders.addAll(
-      functions.unpinnedTasksBuilders(widget.tasks, cardStates, widget.listener)
+      functions.unpinnedTasksBuilders(
+        widget.tasks,
+        cardStates,
+        widget.listener.copy(onRemove: onRemove),
+      )
     );
     
     widgetBuilders.add(
@@ -157,18 +163,6 @@ class _TaskListState extends widgets.State<TaskList>
       itemCount: widgetBuilders.length,
       itemBuilder: (_, index) => widgetBuilders[index](),
     );
-  }
-  
-  void onCheckMarkPressed(int index) {
-    widget.listener.onCheckMarkPressed(index);
-  }
-  
-  void onEditPressed(int index) {
-    widget.listener.onEditPressed(index);
-  }
-  
-  void onPinPressed(int index) {
-    widget.listener.onPinPressed(index);
   }
   
   void onRemove(int index) {
