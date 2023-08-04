@@ -57,11 +57,31 @@ class _State extends State<Page> {
     super.initState();
   }
 
-  void _onFabTap() {
+  void onFabTap() {
+    widget.listener.bitch();
+    return;
+    final tasks = widget.tasks;
+    if (tasks is! Ready<Tasks>) illegalState(widget.tasks, "onFabTap");
     showDialog(
       context: context,
       builder: (_) => const TaskDialog(task: null, presets: IListConst([]))
     ).then((task) => widget.listener.onAddTask(task));
+  }
+
+  void onEditTask(int index) async {
+    final tasks = widget.tasks;
+    if (tasks is! Ready<Tasks>) illegalState(widget.tasks, "onEditTask");
+    final newTask = (
+      await showDialog(
+        context: context,
+        builder: (_) => TaskDialog(
+          task: tasks.value[index],
+          presets: const IListConst([]),
+        ),
+      )
+    ) as Task?;
+    if (newTask == null) return;
+    widget.listener.onEditTask(index, newTask);
   }
 
   @override
@@ -112,7 +132,12 @@ class _State extends State<Page> {
                     Loading() => const loading.Content(),
                     Ready(value: final tasks) => ready.Content(
                       tasks: tasks,
-                      listener: widget.listener,
+                      listener: (
+                        onEditPressed: onEditTask,
+                        onCheckMarkPressed: widget.listener.onCheckTask,
+                        onPinPressed: widget.listener.onPinTask,
+                        onRemove: widget.listener.onRemoveTask,
+                      ),
                       fabClearance: _fabSize + _fabPadding.bottom,
                     ),
                     Error() => todo(),
@@ -126,7 +151,7 @@ class _State extends State<Page> {
                   child: SizedBox.square(
                     dimension: _fabSize,
                     child: FloatingActionButton(
-                      onPressed: _onFabTap,
+                      onPressed: onFabTap,
                       child: const Icon(
                         Icons.add,
                         size: _fabSize - _fabInnerPadding

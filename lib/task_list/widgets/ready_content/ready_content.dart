@@ -14,7 +14,7 @@ const _animationDuration = Duration(milliseconds: 200);
 class Content extends StatefulWidget {
   final double fabClearance;
   final IList<Task> tasks;
-  final PageListener listener;
+  final task_card.Listener listener;
 
   const Content({
     super.key,

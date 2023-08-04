@@ -195,6 +195,30 @@ class _WidgetState extends flutter.State<Coordinator> {
     setState(() {});
   }
 
+  void _bitch() {
+    final state = _state;
+    final tasks = state.tasks;
+    if (tasks is! Ready<Tasks>) illegalState(state, "_checkTask");
+    final newState = state.copy(
+      tasks: tasks.copy(
+        tasks.value.addAll(
+          [
+            (name: "Task 1", dueDate: DateTime.now(), done: false, pinned: false),
+            (name: "Task 2", dueDate: DateTime.now(), done: false, pinned: false),
+            (name: "Task 3", dueDate: DateTime.now(), done: false, pinned: false),
+            (name: "Task 4", dueDate: DateTime.now(), done: false, pinned: false),
+            (name: "Task 5", dueDate: DateTime.now(), done: false, pinned: false),
+            (name: "Task 6", dueDate: DateTime.now(), done: false, pinned: false),
+            (name: "Task 7", dueDate: DateTime.now(), done: false, pinned: false),
+            (name: "Task 8", dueDate: DateTime.now(), done: false, pinned: false),
+          ],
+        )
+      ),
+    );
+    _state = newState;
+    setState(() {});
+  }
+
   @override
   flutter.Widget build(flutter.BuildContext context) {
     return task_list.Page(
@@ -205,6 +229,7 @@ class _WidgetState extends flutter.State<Coordinator> {
         onRemoveTask: _removeTask,
         onCheckTask: _checkTask,
         onPinTask: _pinTask,
+        bitch: _bitch,
       ),
     );
   }

@@ -11,6 +11,7 @@ import 'package:too_many_tasks/task_list/functions/widget_functions.dart' as fun
 import 'package:too_many_tasks/task_list/listener.dart';
 import 'package:too_many_tasks/task_list/widgets/task_card/task_card.dart' as task_card;
 import 'package:too_many_tasks/task_list/widgets/task_card/state.dart' as task_card;
+import 'package:too_many_tasks/task_list/functions/task_functions.dart' as functions;
 
 const _addAnimationDuration = Duration(milliseconds: 500);
 const _removeAnimationDuration = Duration(milliseconds: 500);
@@ -18,7 +19,7 @@ const _removeAnimationDuration = Duration(milliseconds: 500);
 class TaskList extends StatefulWidget {
   final IList<Task> tasks;
   final double bottomPadding;
-  final PageListener listener;
+  final task_card.Listener listener;
   final ScrollController scrollController;
 
   const TaskList({
@@ -60,15 +61,19 @@ class _TaskListState extends widgets.State<TaskList>
 
   @override
   void didUpdateWidget(TaskList oldWidget) {
-    final services = Services.of(context);
-    for (var i = oldWidget.tasks.length; i < widget.tasks.length; i++) {
-      cardStates.add(
-        task_card.BeingAdded(
-          startTime: services.calendar.now(),
-          animationValue: 0
-        )
-      );
-    }
+    // final services = Services.of(context);
+    // for (var i = oldWidget.tasks.length; i < widget.tasks.length; i++) {
+    //   cardStates.add(
+    //     task_card.BeingAdded(
+    //       startTime: services.calendar.now(),
+    //       animationValue: 0
+    //     )
+    //   );
+    // }
+    cardStates.clear();
+    cardStates.addAll(
+      functions.cardStates(oldWidget.tasks, widget.tasks),
+    );
 
     super.didUpdateWidget(oldWidget);
   }
@@ -86,7 +91,7 @@ class _TaskListState extends widgets.State<TaskList>
           final now = Services.of(context).calendar.now();
           final animationValue = (
             now.millisecondsSinceEpoch 
-              - cardState.startTime.millisecondsSinceEpoch
+              - (cardState.startTime ?? now).millisecondsSinceEpoch
           ) / _addAnimationDuration.inMilliseconds;
           if (animationValue > 1.0) {
             cardStates[i] = const task_card.Ready();
@@ -104,11 +109,11 @@ class _TaskListState extends widgets.State<TaskList>
           final now = Services.of(context).calendar.now();
           final animationValue = (
             now.millisecondsSinceEpoch 
-              - cardState.startTime.millisecondsSinceEpoch
+              - (cardState.startTime ?? now).millisecondsSinceEpoch
           ) / _removeAnimationDuration.inMilliseconds;
           if (animationValue > 1.0) {
             cardStates[i] = const task_card.Removed();
-            widget.listener.onRemoveTask(i);
+            widget.listener.onRemove(i);
             setState(() {});
           } else {
             cardStates[i] = task_card.BeingRemoved(
@@ -133,11 +138,7 @@ class _TaskListState extends widgets.State<TaskList>
       functions.pinnedTasksBuilders(
         widget.tasks,
         cardStates,
-        // task_card.listener
-        (
-          onCheckMarkPressed: widget.listener.onCheckTask,
-        )
-        widget.listener.copy(onRemoveTask: onRemove),
+        widget.listener.copy(onRemove: onRemove),
       );
     if (pinnedTasksBuilders.isNotEmpty) {
       widgetBuilders.addAll(pinnedTasksBuilders);
@@ -178,7 +179,8 @@ class _TaskListState extends widgets.State<TaskList>
         final clock = Services.of(context).calendar;
         cardStates[index] = task_card.BeingRemoved(
           startTime: clock.now(),
-          animationValue: 0.0
+          animationValue: 0.0,
+          shouldRemoveDataWhenAnimationEnd: true,
         );
         setState(() {});
       default:

@@ -3,8 +3,8 @@ abstract interface class Calendar {
   DateTime today();
 }
 
-class DefaultClock implements Calendar {
-  const DefaultClock();
+class DefaultCalendar implements Calendar {
+  const DefaultCalendar();
 
   @override
   DateTime now() => DateTime.now();

@@ -34,7 +34,7 @@ class MainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     const sharedPreferences = DefaultSharedPreferences();
     return const Services(
-      calendar: DefaultClock(),
+      calendar: DefaultCalendar(),
       sharedPreferences: sharedPreferences,
       child: Theme(
         colors: testColors,

@@ -1,14 +1,12 @@
-import 'package:too_many_tasks/task_list/widgets/task_card/task_card.dart';
-
 sealed class State {}
 
 final class BeingAdded implements State {
-  final DateTime startTime;
+  final DateTime? startTime;
   final double animationValue;
   
   const BeingAdded({
-    required this.startTime,
-    required this.animationValue,
+    this.startTime,
+    this.animationValue = 0.0,
   });
 }
 
@@ -17,12 +15,14 @@ final class Ready implements State {
 }
 
 final class BeingRemoved implements State {
-  final DateTime startTime;
+  final DateTime? startTime;
   final double animationValue;
+  final bool shouldRemoveDataWhenAnimationEnd;
   
   const BeingRemoved({
-    required this.startTime,
-    required this.animationValue,
+    this.startTime,
+    this.animationValue = 0.0,
+    this.shouldRemoveDataWhenAnimationEnd = false,
   });
 }
 
