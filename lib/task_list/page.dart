@@ -52,20 +52,33 @@ class Page extends StatefulWidget {
 }
 
 class _State extends State<Page> {
-    @override
+  @override
   void initState() {
     super.initState();
   }
 
-  void onFabTap() {
-    widget.listener.bitch();
-    return;
+  @override
+  void didUpdateWidget(Page oldWidget) {
     final tasks = widget.tasks;
-    if (tasks is! Ready<Tasks>) illegalState(widget.tasks, "onFabTap");
-    showDialog(
-      context: context,
-      builder: (_) => const TaskDialog(task: null, presets: IListConst([]))
-    ).then((task) => widget.listener.onAddTask(task));
+    if (tasks is Ready<Tasks>) {      
+      print("tasks here! ${tasks.value.length}");
+    }
+    super.didUpdateWidget(oldWidget);
+  }
+  
+  void onFabTap() {
+    // widget.listener.bitch();
+    final tasks = widget.tasks;
+    if (tasks is Ready<Tasks>) {      
+      print("tasks here! ${tasks.value.length}");
+    }
+    return;
+    // final tasks = widget.tasks;
+    // if (tasks is! Ready<Tasks>) illegalState(widget.tasks, "onFabTap");
+    // showDialog(
+    //   context: context,
+    //   builder: (_) => const TaskDialog(task: null, presets: IListConst([]))
+    // ).then((task) => widget.listener.onAddTask(task));
   }
 
   void onEditTask(int index) async {

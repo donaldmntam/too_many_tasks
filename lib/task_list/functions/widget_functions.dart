@@ -41,6 +41,10 @@ List<Widget Function()> _taskBuilders(
   List<task_card.State> cardStates,
   task_card.Listener listener,
 ) {
+  if (tasks.length != cardStates.length) {
+    throw "tasks.length(${tasks.length}) != cardStates.length(${cardStates.length})";
+  }
+
   final builders = List<Widget Function()>.empty(growable: true);
 
   for (var index = 0; index < cardStates.length; index++) {

@@ -165,6 +165,7 @@ class _WidgetState extends flutter.State<Coordinator> {
     final newState = state.copy(
       tasks: tasks.copy(tasks.value.removeAt(index)),
     );
+    print("_removeTask called here! ${newState.tasks}");
     _state = newState;
     setState(() {});
   }
