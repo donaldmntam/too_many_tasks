@@ -16,3 +16,41 @@ extension ExtendedIterable<T> on Iterable<T> {
     });
   }
 }
+
+List<R> diff<R, T>(
+  Iterable<T> oldIterable,
+  Iterable<T> newIterable,
+  {required bool Function(T oldElement, T newElement) comparator,
+  required R Function(T element) onAddition,
+  required R Function(T element) onUnchanged,
+  required R Function(T element) onDeletion}
+) {
+  final oldIterator = oldIterable.iterator;
+  final newIterator = newIterable.iterator;
+
+  final list = List<R>.empty(growable: true);
+  var oldStart = 0;
+  while (newIterator.moveNext()) {
+    final newElement = newIterator.current;
+    var oldIndex = oldStart;
+    while (oldIterator.moveNext()) {
+      final oldElement = oldIterator.current;
+      final equal = comparator(oldElement, newElement);
+      if (equal) {
+        for (var i = oldStart; i < oldIndex - 1; i++) {
+          list.add(onDeletion(oldElement));
+        }
+        list.add(onUnchanged(newElement));
+        oldStart = oldIndex + 1;
+        break;
+      } else if (oldIndex == oldIterable.length) {
+        list.add(onAddition(newElement));
+        break;
+      } else {
+        oldIndex++;
+      }
+    }
+  }
+  return list;
+}
+
