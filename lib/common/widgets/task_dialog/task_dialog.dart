@@ -1,6 +1,7 @@
 import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:flutter/material.dart' hide Dialog, Theme, TextButton;
 import 'package:too_many_tasks/common/functions/date_functions.dart';
+import 'package:too_many_tasks/common/functions/scope_functions.dart';
 import 'package:too_many_tasks/common/models/task.dart';
 import 'package:too_many_tasks/common/models/task_preset.dart';
 import 'package:too_many_tasks/common/services/services.dart';
@@ -45,11 +46,14 @@ class _TaskDialogState extends State<TaskDialog> {
 
   final nameController = TextEditingController();
   final nameFocusNode = FocusNode();
+
   DateTime? dueDate;
 
   @override
   void initState() {
     super.initState();
+
+    nameController.addListener(() => setState(() {}));
 
     nameController.text = widget.task?.name ?? "";
     dueDate = widget.task?.dueDate;
@@ -113,16 +117,21 @@ class _TaskDialogState extends State<TaskDialog> {
                     _ => strings.task_dialog_edit_task_confirm_button
                   },
                   style: Style.primary,
-                  onPressed: () {
-                    navigator.pop(
-                      (
-                        name: nameController.text,
-                        dueDate: dueDate,
-                        done: widget.task?.done ?? false,
-                        pinned: false,
-                      )
-                    );
-                  },
+                  onPressed: run(() {
+                    final name = nameController.text;
+                    final dueDate = this.dueDate;
+                    if (name.isEmpty || dueDate == null) return null;
+                    return () {
+                      navigator.pop<Task>(
+                        (
+                          name: nameController.text,
+                          dueDate: dueDate,
+                          done: widget.task?.done ?? false,
+                          pinned: false,
+                        )
+                      );
+                    };
+                  }),
                 ),
               ),
               const SizedBox(height: verticalPadding),

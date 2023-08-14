@@ -38,12 +38,12 @@ class Page extends StatefulWidget {
       ? clipboardOverlapHeight
       : clipboardTopWidgetsHeight;
 
-  final Loadable<Tasks> tasks;
+  final Loadable<TaskStates> taskStates;
   final PageListener listener;
 
   const Page({
     super.key,
-    required this.tasks,
+    required this.taskStates,
     required this.listener,
   });
 
@@ -58,10 +58,8 @@ class _State extends State<Page> {
   }
 
   void onFabTap() {
-    widget.listener.bitch();
-    return;
-    final tasks = widget.tasks;
-    if (tasks is! Ready<Tasks>) illegalState(widget.tasks, "onFabTap");
+    final tasks = widget.taskStates;
+    if (tasks is! Ready<TaskStates>) illegalState(widget.taskStates, "onFabTap");
     showDialog(
       context: context,
       builder: (_) => const TaskDialog(task: null, presets: IListConst([]))
@@ -69,13 +67,13 @@ class _State extends State<Page> {
   }
 
   void onEditTask(int index) async {
-    final tasks = widget.tasks;
-    if (tasks is! Ready<Tasks>) illegalState(widget.tasks, "onEditTask");
+    final taskStates = widget.taskStates;
+    if (taskStates is! Ready<TaskStates>) illegalState(widget.taskStates, "onEditTask");
     final newTask = (
       await showDialog(
         context: context,
         builder: (_) => TaskDialog(
-          task: tasks.value[index],
+          task: taskStates.value[index].task,
           presets: const IListConst([]),
         ),
       )
@@ -86,7 +84,7 @@ class _State extends State<Page> {
 
   @override
   Widget build(BuildContext context) {
-    final tasks = widget.tasks;
+    final tasks = widget.taskStates;
     return Scaffold(
       body: LayoutBuilder(
         builder: (context, constraints) {
@@ -130,8 +128,8 @@ class _State extends State<Page> {
                   },
                   child: switch (tasks) {
                     Loading() => const loading.Content(),
-                    Ready(value: final tasks) => ready.Content(
-                      tasks: tasks,
+                    Ready(value: final taskStates) => ready.Content(
+                      taskStates: taskStates,
                       listener: (
                         onEditPressed: onEditTask,
                         onCheckMarkPressed: widget.listener.onCheckTask,

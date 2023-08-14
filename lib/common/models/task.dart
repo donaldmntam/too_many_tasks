@@ -10,7 +10,14 @@ typedef Task = ({
   bool pinned,
 });
 
+typedef TaskState = ({
+  Task task,
+  bool removed,
+});
+
 typedef Tasks = IList<Task>;
+
+typedef TaskStates = IList<TaskState>;
 
 extension ExtendedTask on Task {
   Task copy({
@@ -25,11 +32,46 @@ extension ExtendedTask on Task {
     pinned: pinned ?? this.pinned,
   );
 
+  Task copyBy({
+    String Function(String)? name,
+    DateTime Function(DateTime)? dueDate,
+    bool Function(bool)? done,
+    bool Function(bool)? pinned,
+  }) => (
+    name: name?.call(this.name) ?? this.name,
+    dueDate: dueDate?.call(this.dueDate) ?? this.dueDate,
+    done: done?.call(this.done) ?? this.done,
+    pinned: pinned?.call(this.pinned) ?? this.pinned,
+  );
+
   Json toJson() => {
     "name": name,
     "dueDate": dueDate,
     "done": done,
     "pinned": pinned,
+  };
+}
+
+extension ExtendedTaskState on TaskState {
+  TaskState copy({
+    Task? task,
+    bool? removed,
+  }) => (
+    task: task ?? this.task,
+    removed: removed ?? this.removed,
+  );
+
+  TaskState copyBy({
+    Task Function(Task)? task,
+    bool Function(bool)? removed,
+  }) => (
+    task: task?.call(this.task) ?? this.task,
+    removed: removed?.call(this.removed) ?? this.removed,
+  );
+
+  Json toJson() => {
+    "task": task.toJson(),
+    "removed": removed,
   };
 }
 

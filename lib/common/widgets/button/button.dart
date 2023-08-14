@@ -6,7 +6,7 @@ import 'style.dart';
 
 class Button extends StatelessWidget {
   final Style style;
-  final void Function() onPressed;
+  final void Function()? onPressed;
   final Widget child;
 
   const Button({
@@ -24,9 +24,12 @@ class Button extends StatelessWidget {
       child: Container(
         decoration: ShapeDecoration(
           shape: const StadiumBorder(),
-          color: switch (style) {
-            Style.primary => theme.colors.primary,
-            Style.secondary => theme.colors.secondary,
+          color: switch (onPressed) {
+            null => theme.colors.disabled,
+            _ => switch (style) {
+              Style.primary => theme.colors.primary,
+              Style.secondary => theme.colors.secondary,
+            }
           },
         ),
         child: child,

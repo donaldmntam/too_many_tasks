@@ -7,7 +7,7 @@ import 'style.dart';
 class TextButton extends StatelessWidget {
   final String text;
   final Style style;
-  final void Function() onPressed;
+  final void Function()? onPressed;
 
   const TextButton(
     this.text,
@@ -30,9 +30,12 @@ class TextButton extends StatelessWidget {
             style: theme.textStyle(
               size: 12,
               weight: FontWeight.w500,
-              color: switch (style) {
-                Style.primary => theme.colors.onPrimary,
-                Style.secondary => theme.colors.onSecondary,
+              color: switch (onPressed) {
+                null => theme.colors.onDisabled,
+                _ => switch (style) {
+                  Style.primary => theme.colors.onPrimary,
+                  Style.secondary => theme.colors.onSecondary,
+                }
               },
             ),
           ),

@@ -19,7 +19,7 @@ double _calcOpacity({
 class Tappable extends StatefulWidget {
   final double minOpacity;
   final double maxOpacity;
-  final void Function() onPressed;
+  final void Function()? onPressed;
   final Widget child;
 
   const Tappable({
@@ -99,7 +99,7 @@ class _State extends widgets.State<Tappable> with SingleTickerProviderStateMixin
     switch (state) {
       case Down():
         state = GoingUp(now);
-        if (!cancelled) widget.onPressed();
+        if (!cancelled) widget.onPressed?.call();
         ticker.start();
       default:
         break;
@@ -115,7 +115,10 @@ class _State extends widgets.State<Tappable> with SingleTickerProviderStateMixin
         Up() => 1.0,
       },
       child: GestureDetector(
-        onTapDown: (_) => onTapDown(),
+        onTapDown: (_) => switch (widget.onPressed) {
+          null => null,
+          _ => onTapDown()
+        },
         onTapUp: (_) => onTapUp(cancelled: false),
         onTapCancel: () => onTapUp(cancelled: true), 
         child: widget.child,

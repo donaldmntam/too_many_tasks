@@ -4,18 +4,18 @@ import 'package:too_many_tasks/common/models/task_preset.dart';
 
 class State {
   final Loadable<TaskPresets> taskPresets;
-  final Loadable<Tasks> tasks;
+  final Loadable<TaskStates> taskStates;
 
   const State({
     required this.taskPresets,
-    required this.tasks,
+    required this.taskStates,
   });
 
   State copy({
     Loadable<TaskPresets>? taskPresets,
-    Loadable<Tasks>? tasks,
+    Loadable<TaskStates>? taskStates,
   }) => State(
     taskPresets: taskPresets ?? this.taskPresets,
-    tasks: tasks ?? this.tasks,
+    taskStates: taskStates ?? this.taskStates,
   );
 }

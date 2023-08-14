@@ -10,34 +10,41 @@ bool taskIsPinned({required int index, required int pinnedCount}) {
 }
 
 List<task_card.State> cardStates(
-  Tasks oldTasks,
-  Tasks newTasks,
+  TaskStates oldList,
+  TaskStates newList,
 ) {
-  final length = min(oldTasks.length, newTasks.length);
+  if (newList.length < oldList.length) {
+    return newList
+      .map((taskState) => const task_card.Unpinned())
+      .toList();
+  }
+  
   final list = List<task_card.State>.empty(growable: true);
-  for (var i = 0; i < length; i++) {
-    final oldTask = oldTasks[i];
-    final newTask = newTasks[i];
-    // TODO: implement task changing
-    list.add(const task_card.Ready());
+  for (var i = 0; i < oldList.length; i++) {
+    final oldState = oldList[i];
+    final newState = newList[i];
+
+    if (oldState.removed) {
+      if (newState.removed) {
+        list.add(const task_card.Removed());
+      } else {
+        list.add(const task_card.BeingAdded());
+      }
+    } else {
+      if (newState.removed) {
+        list.add(const task_card.Removed());
+      } else {
+        list.add(const task_card.Unpinned());
+      }
+    }
   }
 
-  final change = tasksChange(oldTasks, newTasks);
-  switch (change) {
-    case > 0:
-      list.addMultiple(
-        change,
-        (_) => const task_card.BeingAdded()
-      );
-    case < 0:
-      list.addMultiple(
-        -change,
-        (index) => const task_card.BeingRemoved()
-      );
-    default:
-      break;
+  if (newList.length == oldList.length) {
+    return list;
   }
 
+  final newTailItemCount = newList.length - oldList.length;
+  list.addMultiple(newTailItemCount, (_) => const task_card.BeingAdded());
   return list;
 }
 

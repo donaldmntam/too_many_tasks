@@ -35,7 +35,7 @@ class _WidgetState extends flutter.State<Coordinator> {
   void initState() {
     _state = const State(
       taskPresets: Loading(),
-      tasks: Loading(),
+      taskStates: Loading(),
     );
     super.initState();
     _loadTasks();
@@ -43,7 +43,7 @@ class _WidgetState extends flutter.State<Coordinator> {
 
   void _loadTasks() async {
     final state = _state;
-    final tasksState = state.tasks;
+    final tasksState = state.taskStates;
     if (tasksState is! Loading) illegalState(state, "_loadTasks");
     (await loadTasksFromSharedPrefs(widget._sharedPrefs)).match(
       ok: _tasksDidLoad,
@@ -53,23 +53,23 @@ class _WidgetState extends flutter.State<Coordinator> {
   
   void _tasksDidLoad(List<Task> loadedTasks) {
     final state = _state;
-    final tasks = state.tasks;
+    final tasks = state.taskStates;
     if (tasks is! Loading) illegalState(state, "_tasksDidLoad");
     // final newTasksState = tasks.TasksReady(tasks: loadedTasks);
     final newTasks = Ready(
-      [
+      <Task>[
         (name: "Task 1", dueDate: DateTime.now(), done: false, pinned: false),
         (name: "Task 2", dueDate: DateTime.now(), done: false, pinned: false),
         (name: "Task 3", dueDate: DateTime.now(), done: false, pinned: false),
-        (name: "Task 4", dueDate: DateTime.now(), done: false, pinned: false),
-        (name: "Task 5", dueDate: DateTime.now(), done: false, pinned: false),
-        (name: "Task 6", dueDate: DateTime.now(), done: false, pinned: false),
-        (name: "Task 7", dueDate: DateTime.now(), done: false, pinned: false),
-        (name: "Task 8", dueDate: DateTime.now(), done: false, pinned: false),
-      ].lock
+        // (name: "Task 4", dueDate: DateTime.now(), done: false, pinned: false),
+        // (name: "Task 5", dueDate: DateTime.now(), done: false, pinned: false),
+        // (name: "Task 6", dueDate: DateTime.now(), done: false, pinned: false),
+        // (name: "Task 7", dueDate: DateTime.now(), done: false, pinned: false),
+        // (name: "Task 8", dueDate: DateTime.now(), done: false, pinned: false),
+      ].map<TaskState>((task) => (task: task, removed: false)).toIList(),
     );
     final newState = state.copy(
-      tasks: newTasks,
+      taskStates: newTasks,
     );
     _state = newState;
     setState(() {});
@@ -77,13 +77,13 @@ class _WidgetState extends flutter.State<Coordinator> {
 
   void _tasksDidFailToLoad(Object? error) {
     final state = _state;
-    final tasks = state.tasks;
+    final tasks = state.taskStates;
     if (tasks is! Loading) {
       illegalState(state, "_tasksDidFailToLoad");
     }
     final newTasks = Error(error);
     final newState = state.copy(
-      tasks: newTasks,
+      taskStates: newTasks,
     );    
     _state = newState;
     setState(() {});
@@ -138,10 +138,12 @@ class _WidgetState extends flutter.State<Coordinator> {
 
   void _addTask(Task task) {
     final state = _state;
-    final tasks = state.tasks; 
-    if (tasks is! Ready<Tasks>) illegalState(state, "_addTask");
+    final taskStates = state.taskStates; 
+    if (taskStates is! Ready<TaskStates>) illegalState(state, "_addTask");
     final newState = state.copy(
-      tasks: tasks.copy(tasks.value.add(task)),
+      taskStates: taskStates.copy(
+        taskStates.value.add((task: task, removed: false))
+      ),
     );
     _state = newState;
     setState(() {});
@@ -149,10 +151,16 @@ class _WidgetState extends flutter.State<Coordinator> {
 
   void _editTask(int index, Task task) {
     final state = _state;
-    final tasks = state.tasks;
-    if (tasks is! Ready<Tasks>) illegalState(state, "_editTask");
+    final taskStates = state.taskStates;
+    if (taskStates is! Ready<TaskStates>) illegalState(state, "_editTask");
+    if (taskStates.value[index].removed) illegalState(state, "_editTask");
     final newState = state.copy(
-      tasks: tasks.copy(tasks.value.replace(index, task)),
+      taskStates: taskStates.copy(
+        taskStates.value.replace(
+          index, 
+          (task: task, removed: false)
+        )
+      ),
     );
     _state = newState;
     setState(() {});
@@ -160,10 +168,16 @@ class _WidgetState extends flutter.State<Coordinator> {
 
   void _removeTask(int index) {
     final state = _state;
-    final tasks = state.tasks;
-    if (tasks is! Ready<Tasks>) illegalState(state, "_removeTask");
+    final taskStates = state.taskStates;
+    if (taskStates is! Ready<TaskStates>) illegalState(state, "_removeTask");
+    if (taskStates.value[index].removed) illegalState(state, "_removeTask");
     final newState = state.copy(
-      tasks: tasks.copy(tasks.value.removeAt(index)),
+      taskStates: taskStates.copy(
+        taskStates.value.replaceBy(
+          index,
+          (taskState) => taskState.copy(removed: true),
+        )
+      ),
     );
     _state = newState;
     setState(() {});
@@ -171,12 +185,20 @@ class _WidgetState extends flutter.State<Coordinator> {
 
   void _checkTask(int index) {
     final state = _state;
-    final tasks = state.tasks;
-    if (tasks is! Ready<Tasks>) illegalState(state, "_checkTask");
-    final target = tasks.value[index];
-    final replacement = target.copy(done: !target.done);
+    final taskStates = state.taskStates;
+    if (taskStates is! Ready<TaskStates>) illegalState(state, "_checkTask");
+    if (taskStates.value[index].removed) illegalState(state, "_checkTask");
     final newState = state.copy(
-      tasks: tasks.copy(tasks.value.replace(index, replacement)),
+      taskStates: taskStates.copy(
+        taskStates.value.replaceBy(
+          index,
+          (taskState) => taskState.copyBy(
+            task: (task) => task.copyBy(
+              done: (done) => !done
+            )
+          )
+        )
+      ),
     );
     _state = newState;
     setState(() {});
@@ -184,12 +206,20 @@ class _WidgetState extends flutter.State<Coordinator> {
 
   void _pinTask(int index) {
     final state = _state;
-    final tasks = state.tasks;
-    if (tasks is! Ready<Tasks>) illegalState(state, "_checkTask");
-    final target = tasks.value[index];
-    final replacement = target.copy(pinned: !target.pinned);
+    final taskStates = state.taskStates;
+    if (taskStates is! Ready<TaskStates>) illegalState(state, "_pinTask");
+    if (taskStates.value[index].removed) illegalState(state, "_pinTask");
     final newState = state.copy(
-      tasks: tasks.copy(tasks.value.replace(index, replacement)),
+      taskStates: taskStates.copy(
+        taskStates.value.replaceBy(
+          index,
+          (taskState) => taskState.copyBy(
+            task: (task) => task.copyBy(
+              pinned: (pinned) => !pinned,
+            )
+          )
+        )
+      ),
     );
     _state = newState;
     setState(() {});
@@ -197,20 +227,20 @@ class _WidgetState extends flutter.State<Coordinator> {
 
   void _bitch() {
     final state = _state;
-    final tasks = state.tasks;
-    if (tasks is! Ready<Tasks>) illegalState(state, "_checkTask");
+    final taskStates = state.taskStates;
+    if (taskStates is! Ready<TaskStates>) illegalState(state, "_checkTask");
     final newState = state.copy(
-      tasks: tasks.copy(
-        tasks.value.addAll(
-          [
-            (name: "Task 1", dueDate: DateTime.now(), done: false, pinned: false),
-            (name: "Task 2", dueDate: DateTime.now(), done: false, pinned: false),
-            (name: "Task 3", dueDate: DateTime.now(), done: false, pinned: false),
-            (name: "Task 4", dueDate: DateTime.now(), done: false, pinned: false),
-            (name: "Task 5", dueDate: DateTime.now(), done: false, pinned: false),
-            (name: "Task 6", dueDate: DateTime.now(), done: false, pinned: false),
-            (name: "Task 7", dueDate: DateTime.now(), done: false, pinned: false),
-            (name: "Task 8", dueDate: DateTime.now(), done: false, pinned: false),
+      taskStates: taskStates.copy(
+        taskStates.value.addAll(
+          <TaskState>[
+            (task: (name: "Task 1", dueDate: DateTime.now(), done: false, pinned: false), removed: true),
+            (task: (name: "Task 2", dueDate: DateTime.now(), done: false, pinned: false), removed: true),
+            (task: (name: "Task 3", dueDate: DateTime.now(), done: false, pinned: false), removed: true),
+            (task: (name: "Task 4", dueDate: DateTime.now(), done: false, pinned: false), removed: true),
+            (task: (name: "Task 5", dueDate: DateTime.now(), done: false, pinned: false), removed: true),
+            (task: (name: "Task 6", dueDate: DateTime.now(), done: false, pinned: false), removed: true),
+            (task: (name: "Task 7", dueDate: DateTime.now(), done: false, pinned: false), removed: true),
+            (task: (name: "Task 8", dueDate: DateTime.now(), done: false, pinned: false), removed: true),
           ],
         )
       ),
@@ -222,7 +252,7 @@ class _WidgetState extends flutter.State<Coordinator> {
   @override
   flutter.Widget build(flutter.BuildContext context) {
     return task_list.Page(
-      tasks: _state.tasks,
+      taskStates: _state.taskStates,
       listener: (
         onAddTask: _addTask,
         onEditTask: _editTask,

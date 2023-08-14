@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:flutter/material.dart' hide State, Theme;
 import 'package:flutter/scheduler.dart';
@@ -17,14 +19,14 @@ const _addAnimationDuration = Duration(milliseconds: 500);
 const _removeAnimationDuration = Duration(milliseconds: 500);
 
 class TaskList extends StatefulWidget {
-  final IList<Task> tasks;
+  final TaskStates taskStates;
   final double bottomPadding;
   final task_card.Listener listener;
   final ScrollController scrollController;
 
   const TaskList({
     super.key,
-    required this.tasks,
+    required this.taskStates,
     required this.bottomPadding,
     required this.listener,
     required this.scrollController,
@@ -42,8 +44,8 @@ class _TaskListState extends widgets.State<TaskList>
   
   @override
   void initState() {
-    cardStates = widget.tasks.mapIndexed<task_card.State>((task, index) {
-      return const task_card.Ready();
+    cardStates = widget.taskStates.mapIndexed<task_card.State>((task, index) {
+      return const task_card.Unpinned();
     }).toList();
 
     ticker = createTicker(onTick);
@@ -72,7 +74,7 @@ class _TaskListState extends widgets.State<TaskList>
     // }
     cardStates.clear();
     cardStates.addAll(
-      functions.cardStates(oldWidget.tasks, widget.tasks),
+      functions.cardStates(oldWidget.taskStates, widget.taskStates),
     );
 
     super.didUpdateWidget(oldWidget);
@@ -82,19 +84,19 @@ class _TaskListState extends widgets.State<TaskList>
     for (var i = 0; i < cardStates.length; i++) {
       final cardState = cardStates[i];
       switch (cardState) {
-        case task_card.Ready():
+        case task_card.Unpinned():
+        case task_card.Pinned():
         case task_card.Removed():
           break;
-        case task_card.BeingAdded(
-          startTime: final startTime,
-        ):
+        case task_card.BeingPinned(startTime: final cardStateStartTime):
+        case task_card.BeingAdded(startTime: final cardStateStartTime):
           final now = Services.of(context).calendar.now();
+          final startTime = cardStateStartTime ?? now;
           final animationValue = (
-            now.millisecondsSinceEpoch 
-              - (cardState.startTime ?? now).millisecondsSinceEpoch
+            now.millisecondsSinceEpoch - startTime.millisecondsSinceEpoch
           ) / _addAnimationDuration.inMilliseconds;
           if (animationValue > 1.0) {
-            cardStates[i] = const task_card.Ready();
+            cardStates[i] = const task_card.Unpinned();
             setState(() {});
           } else {
             cardStates[i] = task_card.BeingAdded(
@@ -103,13 +105,12 @@ class _TaskListState extends widgets.State<TaskList>
             );
             setState(() {});
           }
-        case task_card.BeingRemoved(
-          startTime: final startTime,
-        ):
+        case task_card.BeingRemoved(startTime: final cardStateStartTime):
+        case task_card.BeingUnpinned(startTime: final cardStateStartTime):
           final now = Services.of(context).calendar.now();
+          final startTime = cardStateStartTime ?? now;
           final animationValue = (
-            now.millisecondsSinceEpoch 
-              - (cardState.startTime ?? now).millisecondsSinceEpoch
+            now.millisecondsSinceEpoch - startTime.millisecondsSinceEpoch
           ) / _removeAnimationDuration.inMilliseconds;
           if (animationValue > 1.0) {
             cardStates[i] = const task_card.Removed();
@@ -130,57 +131,64 @@ class _TaskListState extends widgets.State<TaskList>
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    final widgetBuilders = List<Widget Function()>.empty(growable: true);
+    final widgetBuilders = List<Widget>.empty(growable: true);
 
-    widgetBuilders.add(() => const SizedBox(height: taskListPadding));
+    widgetBuilders.add(const SizedBox(height: taskListPadding));
 
     final pinnedTasksBuilders = 
       functions.pinnedTasksBuilders(
-        widget.tasks,
+        widget.taskStates,
         cardStates,
         widget.listener.copy(onRemove: onRemove),
       );
     if (pinnedTasksBuilders.isNotEmpty) {
       widgetBuilders.addAll(pinnedTasksBuilders);
-      widgetBuilders.add(() => Padding(
-        padding: middleTaskListItemEdgeInsets,
-        child: Divider(
-          color: theme.colors.onBackground400,
+      widgetBuilders.add(
+        Padding(
+          padding: middleTaskListItemEdgeInsets,
+          child: Divider(
+            color: theme.colors.onBackground400,
+          )
         )
-      ));
+      );
     }
 
     widgetBuilders.addAll(
       functions.unpinnedTasksBuilders(
-        widget.tasks,
+        widget.taskStates,
         cardStates,
         widget.listener.copy(onRemove: onRemove),
       )
     );
     
     widgetBuilders.add(
-      () => SizedBox(
+      SizedBox(
         height: widget.bottomPadding + taskListPadding,
       ),
     );
 
-    return ListView.builder(
-      physics: const BouncingScrollPhysics(),
-      controller: widget.scrollController,
-      itemCount: widgetBuilders.length,
-      itemBuilder: (_, index) => widgetBuilders[index](),
+    return Column(
+      children: [
+        Flexible(flex: 1, child: ListView.builder(
+          physics: const BouncingScrollPhysics(),
+          controller: widget.scrollController,
+          itemCount: widgetBuilders.length,
+          itemBuilder: (_, index) => widgetBuilders[index],
+        )),
+        ElevatedButton(onPressed: () => print("cardStates here! ${inspect(cardStates)}"), child: Text("inspect"))
+      ],
     );
   }
   
   void onRemove(int index) {
     final cardState = cardStates[index];
     switch (cardState) {
-      case task_card.Ready():
+      case task_card.Unpinned():
         final clock = Services.of(context).calendar;
         cardStates[index] = task_card.BeingRemoved(
           startTime: clock.now(),
           animationValue: 0.0,
-          shouldRemoveDataWhenAnimationEnd: true,
+          shouldRemoveDataWhenAnimationEnds: true,
         );
         setState(() {});
       default:

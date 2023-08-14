@@ -35,7 +35,6 @@ class _State extends State<AnimatedProportionBox>
 
   void onTick(Duration duration) {
     final proportion = (duration.inMilliseconds % 1000) / 1000;
-    print("proportion $proportion");
     setState(() => this.proportion = proportion);
   }
 

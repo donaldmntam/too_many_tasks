@@ -13,13 +13,13 @@ const _animationDuration = Duration(milliseconds: 200);
 
 class Content extends StatefulWidget {
   final double fabClearance;
-  final IList<Task> tasks;
+  final TaskStates taskStates;
   final task_card.Listener listener;
 
   const Content({
     super.key,
     required this.fabClearance,
-    required this.tasks,
+    required this.taskStates,
     required this.listener
   });
 
@@ -81,7 +81,7 @@ class _ContentState extends widgets.State<Content> {
               Flexible(
                 flex: 1,
                 child: TaskList(
-                  tasks: widget.tasks,
+                  taskStates: widget.taskStates,
                   bottomPadding: bottomInset + widget.fabClearance, 
                   listener: widget.listener,
                   scrollController: controller

@@ -8,3 +8,11 @@ extension ExtendedTasks on Iterable<Task> {
     return countIf((e) => e.done) / length;
   }
 }
+
+extension ExtendedTaskStates on Iterable<TaskState> {
+  double get progress {
+    final length = this.length;
+    if (length == 0) return 0;
+    return countIf((e) => e.task.done) / length;
+  }
+}
