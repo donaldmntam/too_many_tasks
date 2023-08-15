@@ -131,49 +131,57 @@ class _TaskListState extends widgets.State<TaskList>
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    final widgetBuilders = List<Widget>.empty(growable: true);
-
-    widgetBuilders.add(const SizedBox(height: taskListPadding));
-
-    final pinnedTasksBuilders = 
-      functions.pinnedTasksBuilders(
-        widget.taskStates,
-        cardStates,
-        widget.listener.copy(onRemove: onRemove),
-      );
-    if (pinnedTasksBuilders.isNotEmpty) {
-      widgetBuilders.addAll(pinnedTasksBuilders);
-      widgetBuilders.add(
-        Padding(
-          padding: middleTaskListItemEdgeInsets,
-          child: Divider(
-            color: theme.colors.onBackground400,
-          )
-        )
-      );
-    }
-
-    widgetBuilders.addAll(
-      functions.unpinnedTasksBuilders(
-        widget.taskStates,
-        cardStates,
-        widget.listener.copy(onRemove: onRemove),
-      )
+    final widgets = functions.widgets(
+      bottomPadding: widget.bottomPadding,
+      theme: theme,
+      taskStates: widget.taskStates,
+      cardStates: cardStates,
+      listener: widget.listener,
     );
+
+    // final widgetBuilders = List<Widget>.empty(growable: true);
+
+    // widgetBuilders.add(const SizedBox(height: taskListPadding));
+
+    // final pinnedTasksBuilders = 
+    //   functions.pinnedTasksBuilders(
+    //     widget.taskStates,
+    //     cardStates,
+    //     widget.listener.copy(onRemove: onRemove),
+    //   );
+    // if (pinnedTasksBuilders.isNotEmpty) {
+    //   widgetBuilders.addAll(pinnedTasksBuilders);
+    //   widgetBuilders.add(
+    //     Padding(
+    //       padding: middleTaskListItemEdgeInsets,
+    //       child: Divider(
+    //         color: theme.colors.onBackground400,
+    //       )
+    //     )
+    //   );
+    // }
+
+    // widgetBuilders.addAll(
+    //   functions.unpinnedTasksBuilders(
+    //     widget.taskStates,
+    //     cardStates,
+    //     widget.listener.copy(onRemove: onRemove),
+    //   )
+    // );
     
-    widgetBuilders.add(
-      SizedBox(
-        height: widget.bottomPadding + taskListPadding,
-      ),
-    );
+    // widgetBuilders.add(
+    //   SizedBox(
+    //     height: widget.bottomPadding + taskListPadding,
+    //   ),
+    // );
 
     return Column(
       children: [
         Flexible(flex: 1, child: ListView.builder(
           physics: const BouncingScrollPhysics(),
           controller: widget.scrollController,
-          itemCount: widgetBuilders.length,
-          itemBuilder: (_, index) => widgetBuilders[index],
+          itemCount: widgets.length,
+          itemBuilder: (_, index) => widgets[index],
         )),
         ElevatedButton(onPressed: () => print("cardStates here! ${inspect(cardStates)}"), child: Text("inspect"))
       ],
