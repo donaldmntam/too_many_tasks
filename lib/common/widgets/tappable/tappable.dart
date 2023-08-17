@@ -117,7 +117,7 @@ class _State extends widgets.State<Tappable> with SingleTickerProviderStateMixin
       child: GestureDetector(
         onTapDown: (_) => switch (widget.onPressed) {
           null => null,
-          _ => onTapDown()
+          _ => onTapDown
         },
         onTapUp: (_) => onTapUp(cancelled: false),
         onTapCancel: () => onTapUp(cancelled: true), 

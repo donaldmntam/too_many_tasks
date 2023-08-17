@@ -32,9 +32,21 @@ List<task_card.State> cardStates(
       }
     } else {
       if (newState.removed) {
-        list.add(const task_card.Removed());
+        list.add(const task_card.BeingRemoved());
       } else {
-        list.add(const task_card.Unpinned());
+        if (oldState.task.pinned) {
+          if (newState.task.pinned) {
+            list.add(const task_card.Pinned());
+          } else {
+            list.add(const task_card.BeingUnpinned());
+          }
+        } else {
+          if (newState.task.pinned) {
+            list.add(const task_card.BeingPinned());
+          } else {
+            list.add(const task_card.Unpinned());
+          }
+        }
       }
     }
   }

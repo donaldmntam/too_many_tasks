@@ -72,6 +72,7 @@ class _TaskListState extends widgets.State<TaskList>
     //     )
     //   );
     // }
+    print("didUpdateWidget!");
     cardStates.clear();
     cardStates.addAll(
       functions.cardStates(oldWidget.taskStates, widget.taskStates),
@@ -89,6 +90,21 @@ class _TaskListState extends widgets.State<TaskList>
         case task_card.Removed():
           break;
         case task_card.BeingPinned(startTime: final cardStateStartTime):
+          final now = Services.of(context).calendar.now();
+          final startTime = cardStateStartTime ?? now;
+          final animationValue = (
+            now.millisecondsSinceEpoch - startTime.millisecondsSinceEpoch
+          ) / _addAnimationDuration.inMilliseconds;
+          if (animationValue > 1.0) {
+            cardStates[i] = const task_card.Pinned();
+            setState(() {});
+          } else {
+            cardStates[i] = task_card.BeingPinned(
+              startTime: startTime,
+              animationValue: animationValue,
+            );
+            setState(() {});
+          }
         case task_card.BeingAdded(startTime: final cardStateStartTime):
           final now = Services.of(context).calendar.now();
           final startTime = cardStateStartTime ?? now;
@@ -106,7 +122,6 @@ class _TaskListState extends widgets.State<TaskList>
             setState(() {});
           }
         case task_card.BeingRemoved(startTime: final cardStateStartTime):
-        case task_card.BeingUnpinned(startTime: final cardStateStartTime):
           final now = Services.of(context).calendar.now();
           final startTime = cardStateStartTime ?? now;
           final animationValue = (
@@ -114,10 +129,27 @@ class _TaskListState extends widgets.State<TaskList>
           ) / _removeAnimationDuration.inMilliseconds;
           if (animationValue > 1.0) {
             cardStates[i] = const task_card.Removed();
-            widget.listener.onRemove(i);
+            // widget.listener.onRemove(i);
             setState(() {});
           } else {
             cardStates[i] = task_card.BeingRemoved(
+              startTime: startTime,
+              animationValue: animationValue,
+            );
+            setState(() {});
+          }
+        case task_card.BeingUnpinned(startTime: final cardStateStartTime):
+          final now = Services.of(context).calendar.now();
+          final startTime = cardStateStartTime ?? now;
+          final animationValue = (
+            now.millisecondsSinceEpoch - startTime.millisecondsSinceEpoch
+          ) / _removeAnimationDuration.inMilliseconds;
+          if (animationValue > 1.0) {
+            cardStates[i] = const task_card.Unpinned();
+            // widget.listener.onRemove(i);
+            setState(() {});
+          } else {
+            cardStates[i] = task_card.BeingUnpinned(
               startTime: startTime,
               animationValue: animationValue,
             );

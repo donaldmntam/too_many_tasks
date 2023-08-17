@@ -55,7 +55,7 @@ final class BeingUnpinned implements State {
 
   const BeingUnpinned({
     this.startTime,
-    this.animationValue = 1.0,
+    this.animationValue = 0.0,
     this.shouldEditDataWhenAnimationEnds = false,
   });
 }

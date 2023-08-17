@@ -167,10 +167,12 @@ class _WidgetState extends flutter.State<Coordinator> {
   }
 
   void _removeTask(int index) {
+    print("removeTask!");
     final state = _state;
     final taskStates = state.taskStates;
     if (taskStates is! Ready<TaskStates>) illegalState(state, "_removeTask");
     if (taskStates.value[index].removed) illegalState(state, "_removeTask");
+    print("tasks before removal ${taskStates.value.join(",")}");
     final newState = state.copy(
       taskStates: taskStates.copy(
         taskStates.value.replaceBy(
@@ -179,6 +181,7 @@ class _WidgetState extends flutter.State<Coordinator> {
         )
       ),
     );
+    print("tasks after removal ${(newState.taskStates as dynamic).value.join(",")}");
     _state = newState;
     setState(() {});
   }
@@ -209,6 +212,7 @@ class _WidgetState extends flutter.State<Coordinator> {
     final taskStates = state.taskStates;
     if (taskStates is! Ready<TaskStates>) illegalState(state, "_pinTask");
     if (taskStates.value[index].removed) illegalState(state, "_pinTask");
+    print("tasks before pinning ${taskStates.value.join(",")}");
     final newState = state.copy(
       taskStates: taskStates.copy(
         taskStates.value.replaceBy(
@@ -221,6 +225,7 @@ class _WidgetState extends flutter.State<Coordinator> {
         )
       ),
     );
+    print("tasks after pinning ${(newState.taskStates as Ready<TaskStates>).value.join(",")}");
     _state = newState;
     setState(() {});
   }
