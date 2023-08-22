@@ -72,7 +72,6 @@ class _TaskListState extends widgets.State<TaskList>
     //     )
     //   );
     // }
-    print("didUpdateWidget!");
     cardStates.clear();
     cardStates.addAll(
       functions.cardStates(oldWidget.taskStates, widget.taskStates),
@@ -129,7 +128,6 @@ class _TaskListState extends widgets.State<TaskList>
           ) / _removeAnimationDuration.inMilliseconds;
           if (animationValue > 1.0) {
             cardStates[i] = const task_card.Removed();
-            // widget.listener.onRemove(i);
             setState(() {});
           } else {
             cardStates[i] = task_card.BeingRemoved(
@@ -170,42 +168,6 @@ class _TaskListState extends widgets.State<TaskList>
       cardStates: cardStates,
       listener: widget.listener,
     );
-
-    // final widgetBuilders = List<Widget>.empty(growable: true);
-
-    // widgetBuilders.add(const SizedBox(height: taskListPadding));
-
-    // final pinnedTasksBuilders = 
-    //   functions.pinnedTasksBuilders(
-    //     widget.taskStates,
-    //     cardStates,
-    //     widget.listener.copy(onRemove: onRemove),
-    //   );
-    // if (pinnedTasksBuilders.isNotEmpty) {
-    //   widgetBuilders.addAll(pinnedTasksBuilders);
-    //   widgetBuilders.add(
-    //     Padding(
-    //       padding: middleTaskListItemEdgeInsets,
-    //       child: Divider(
-    //         color: theme.colors.onBackground400,
-    //       )
-    //     )
-    //   );
-    // }
-
-    // widgetBuilders.addAll(
-    //   functions.unpinnedTasksBuilders(
-    //     widget.taskStates,
-    //     cardStates,
-    //     widget.listener.copy(onRemove: onRemove),
-    //   )
-    // );
-    
-    // widgetBuilders.add(
-    //   SizedBox(
-    //     height: widget.bottomPadding + taskListPadding,
-    //   ),
-    // );
 
     return Column(
       children: [

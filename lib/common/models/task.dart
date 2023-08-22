@@ -44,12 +44,7 @@ extension ExtendedTask on Task {
     pinned: pinned?.call(this.pinned) ?? this.pinned,
   );
 
-  Json toJson() => {
-    "name": name,
-    "dueDate": dueDate,
-    "done": done,
-    "pinned": pinned,
-  };
+  Json toJson() => taskToJson(this);
 }
 
 extension ExtendedTaskState on TaskState {
@@ -75,7 +70,16 @@ extension ExtendedTaskState on TaskState {
   };
 }
 
-Result<Task> taskFromJson(Json json) {
+Json taskToJson(Task task) {
+  return {
+    "name": task.name,
+    "dueDate": task.dueDate,
+    "done": task.done,
+    "pinned": task.pinned,
+  };
+}
+
+Result<Task> jsonToTask(Json json) {
   if (
     json case {
       "name": String name,
@@ -94,19 +98,19 @@ Result<Task> taskFromJson(Json json) {
   return Err(jsonErrorMessage("Task", json));
 }
 
-Result<List<Task>> tasksFromJson(Json json) {
-  if (json is! List) {
-    return Err(jsonErrorMessage("List<Task>", json));
-  }
-  final tasks = List<Task>.empty(growable: true);
-  for (final element in json) {
-    final task = taskFromJson(element);
-    switch (task) {
-      case Ok(value: final task):
-        tasks.add(task);
-      case Err(value: final error): 
-        return Err(jsonErrorMessage("List<Task>", json, [error]));
-    }
-  }
-  return Ok(tasks);
-}
+// Result<IList<Task>> tasksFromJson(Json json) {
+//   if (json is! List) {
+//     return Err(jsonErrorMessage("List<Task>", json));
+//   }
+//   final tasks = List<Task>.empty(growable: true);
+//   for (final element in json) {
+//     final task = jsonToTask(element);
+//     switch (task) {
+//       case Ok(value: final task):
+//         tasks.add(task);
+//       case Err(value: final error): 
+//         return Err(jsonErrorMessage("List<Task>", json, [error]));
+//     }
+//   }
+//   return Ok(tasks.lock);
+// }

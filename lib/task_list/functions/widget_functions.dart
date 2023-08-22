@@ -60,7 +60,7 @@ List<Widget> widgets({
     final double visibility = switch (cardState) {
       task_card.Pinned() => 1,
       task_card.BeingPinned() => cardState.animationValue,
-      task_card.BeingUnpinned() => (1 - cardState.animationValue).also((it) => print("visibility here $it")),
+      task_card.BeingUnpinned() => (1 - cardState.animationValue),
       _ => 0,
     };
     if (visibility <= 0.0) continue;

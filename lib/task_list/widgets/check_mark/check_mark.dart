@@ -34,7 +34,7 @@ class _CheckMarkState extends State<CheckMark> with TickerProviderStateMixin {
       vsync: this,
       upperBound: 0.6,
     );
-    controller.duration = const Duration(milliseconds: 1000);
+    controller.duration = const Duration(milliseconds: 500);
 
     if (done) {
       controller.value = controller.upperBound;

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart' hide Theme, Page, Localizations;
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:too_many_tasks/common/coordinator/coordinator.dart';
+import 'package:too_many_tasks/common/services/app_cycle_message_stream.dart';
 import 'package:too_many_tasks/common/services/clock.dart';
 import 'package:too_many_tasks/common/services/shared_preferences.dart';
 import 'package:flutter_gen/gen_l10n/strings.dart';
@@ -33,10 +34,11 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const sharedPreferences = DefaultSharedPreferences();
-    return const Services(
-      calendar: DefaultCalendar(),
+    return Services(
+      calendar: const DefaultCalendar(),
       sharedPreferences: sharedPreferences,
-      child: Theme(
+      appCycleMessageStream: defaultAppCycleMessageStream(),
+      child: const Theme(
         colors: testColors,
         fontFamily: "",
         child: MaterialApp(

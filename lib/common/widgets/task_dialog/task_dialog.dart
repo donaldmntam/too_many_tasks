@@ -121,7 +121,9 @@ class _TaskDialogState extends State<TaskDialog> {
                     final name = nameController.text;
                     final dueDate = this.dueDate;
                     if (name.isEmpty || dueDate == null) return null;
+                    print("enabled!");
                     return () {
+                      print("onPress here!");
                       navigator.pop<Task>(
                         (
                           name: nameController.text,
@@ -139,6 +141,7 @@ class _TaskDialogState extends State<TaskDialog> {
           ),
           secondChild: Padding(
             padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
+            // TODO: deselection
             child: CalendarDatePicker(
               initialDate: now,
               firstDate: DateTime(now.year - 100, now.month, now.day),
