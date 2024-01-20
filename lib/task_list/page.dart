@@ -99,7 +99,7 @@ class _State extends State<Page> {
                     progress: switch (tasks) {
                       Loading() => null,
                       Ready(value: final tasks) => tasks.progress,
-                      Error() => todo(),
+                      Error(error: final error) => throw error!,
                     }
                   ),
                 ),

@@ -47,7 +47,8 @@ class _WidgetState extends flutter.State<Coordinator> {
     final state = _state;
     final taskStates = state.taskStates;
     if (taskStates is! Ready<TaskStates>) return;
-    await widget.sharedPrefs.setTasksWithTaskStates(taskStates.value);
+    final result = await widget.sharedPrefs.setTasksWithTaskStates(taskStates.value);
+    print('result here! ${result.toPrettyString()}');
   }
 
   void _loadTasks() async {
@@ -61,11 +62,12 @@ class _WidgetState extends flutter.State<Coordinator> {
   }
   
   void _tasksDidLoad(IList<Task> loadedTasks) {
+    print('tasks did load here! ${loadedTasks.length}');
     final state = _state;
     final tasks = state.taskStates;
     if (tasks is! Loading) illegalState(state, "_tasksDidLoad");
     // final newTasksState = tasks.TasksReady(tasks: loadedTasks);
-    final newTasks = Ready(
+    final newTasksHardcoded = Ready(
       <Task>[
         (name: "Task 1", dueDate: DateTime.now(), done: false, pinned: false),
         (name: "Task 2", dueDate: DateTime.now(), done: false, pinned: false),
@@ -77,8 +79,11 @@ class _WidgetState extends flutter.State<Coordinator> {
         // (name: "Task 8", dueDate: DateTime.now(), done: false, pinned: false),
       ].map<TaskState>((task) => (task: task, removed: false)).toIList(),
     );
+    final newTasks = loadedTasks
+      .map<TaskState>((t) => (task: t, removed: false))
+      .toIList();
     final newState = state.copy(
-      taskStates: newTasks,
+      taskStates: Ready(newTasks),
     );
     _state = newState;
     setState(() {});

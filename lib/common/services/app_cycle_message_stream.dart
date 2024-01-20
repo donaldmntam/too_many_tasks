@@ -13,7 +13,7 @@ Stream<AppCycleMessage> defaultAppCycleMessageStream() {
 
   WidgetsBinding.instance.addObserver(
     LifecycleEventHandler(
-      resumeCallBack: () async {}, 
+      resumedCallBack: () async {}, 
       detachedCallBack: () async => controller.add(const DidDetach()),
     )
   );
@@ -23,11 +23,11 @@ Stream<AppCycleMessage> defaultAppCycleMessageStream() {
 
 
 class LifecycleEventHandler extends WidgetsBindingObserver {
-  final Future<void> Function() resumeCallBack;
+  final Future<void> Function() resumedCallBack;
   final Future<void> Function() detachedCallBack;
 
   LifecycleEventHandler({
-    required this.resumeCallBack, 
+    required this.resumedCallBack, 
     required this.detachedCallBack,
   });
 
@@ -36,12 +36,13 @@ class LifecycleEventHandler extends WidgetsBindingObserver {
     print("didChangeAppLifecycleState $state");
     switch (state) {
       case AppLifecycleState.inactive:
+      case AppLifecycleState.hidden:
       case AppLifecycleState.paused:
       case AppLifecycleState.detached:
         await detachedCallBack();
         break;
       case AppLifecycleState.resumed:
-        await resumeCallBack();
+        await resumedCallBack();
         break;
     }
   }

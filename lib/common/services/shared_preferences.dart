@@ -61,22 +61,19 @@ class DefaultSharedPreferences implements SharedPreferences {
 
 extension ExtendedSharedPreferences on SharedPreferences {
   Future<Result<IList<Task>>> getTasks() async {
-    final stringsResult = await getStrings(SharedPrefsKeys.tasks);
-    if (stringsResult is Err) return stringsResult;
+    final stringResult = await getString(SharedPrefsKeys.tasks);
+    if (stringResult is Err) return stringResult;
 
-    final strings = stringsResult.unwrap();
+    final string = stringResult.unwrap();
+    if (string is None) return const Result.ok(IListConst([]));
 
-    final decodedResult = strings.map(tryJsonDecode).flattenResults();
+    final decodedResult = tryJsonDecode(string.unwrap());
     if (decodedResult is Err) return decodedResult;
 
-    final decoded = decodedResult.unwrap();
-
-    final tasksResult = decoded
-      .map(jsonToTask)
-      .flattenResults();
+    final tasksResult = jsonToTasks(decodedResult.unwrap());
     if (tasksResult is Err) return tasksResult;
 
-    return Result.ok(tasksResult.unwrap().lock);
+    return tasksResult;
   }
 
   Future<Result<Unit>> setTasks(

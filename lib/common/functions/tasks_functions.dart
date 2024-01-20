@@ -13,6 +13,9 @@ extension ExtendedTaskStates on Iterable<TaskState> {
   double get progress {
     final length = this.length;
     if (length == 0) return 0;
-    return countIf((e) => e.task.done) / length;
+
+    final nonRemoved = where((e) => !e.removed);
+    return nonRemoved.countIf((e) => e.task.done) /
+      nonRemoved.length;
   }
 }

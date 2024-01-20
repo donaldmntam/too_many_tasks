@@ -73,7 +73,7 @@ extension ExtendedTaskState on TaskState {
 Json taskToJson(Task task) {
   return {
     "name": task.name,
-    "dueDate": task.dueDate,
+    "dueDate": task.dueDate.toIso8601String(),
     "done": task.done,
     "pinned": task.pinned,
   };
@@ -83,11 +83,15 @@ Result<Task> jsonToTask(Json json) {
   if (
     json case {
       "name": String name,
-      "dueDate": DateTime dueDate,
+      "dueDate": String dueDateEncoded,
       "done": bool done,
       "pinned": bool pinned,
     }
   ) {
+    final dueDate = DateTime.tryParse(dueDateEncoded);
+    if (dueDate == null) {
+      return Err(jsonErrorMessage("Task", json));
+    }
     return Ok((
       name: name,
       dueDate: dueDate,
@@ -96,6 +100,19 @@ Result<Task> jsonToTask(Json json) {
     ));
   }
   return Err(jsonErrorMessage("Task", json));
+}
+
+Result<IList<Task>> jsonToTasks(Json json) {
+  if (json is! JsonArray) {
+    return Err(jsonErrorMessage("IList<Task>", json));
+  }
+  final list = List<Task>.empty(growable: true);
+  for (final e in json) {
+    final result = jsonToTask(e);
+    if (result is Err) return result;
+    list.add(result.unwrap());
+  }
+  return Result.ok(list.lock);
 }
 
 // Result<IList<Task>> tasksFromJson(Json json) {

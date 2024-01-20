@@ -1,6 +1,6 @@
 sealed class Result<T> {
   const factory Result.ok(T value) = Ok;
-  const factory Result.err(Object? value) = Err;
+  const factory Result.err(Object? value) = Err;  
 }
 
 final class Ok<T> implements Result<T> {
@@ -48,6 +48,13 @@ extension ExtendedResult<T> on Result<T> {
     return switch (this) {
       Ok(value: final value) => ok(value),
       Err(value: final value) => err(value),
+    };
+  }
+
+  String toPrettyString() {
+    return switch (this) {
+      Ok(value: final value) => 'Ok { $value }',
+      Err(value: final value) => 'Err { $value }',
     };
   }
 }
