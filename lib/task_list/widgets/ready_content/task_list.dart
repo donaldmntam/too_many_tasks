@@ -144,7 +144,7 @@ class _TaskListState extends widgets.State<TaskList>
           ) / _removeAnimationDuration.inMilliseconds;
           if (animationValue > 1.0) {
             cardStates[i] = const task_card.Unpinned();
-            // widget.listener.onRemove(i);
+            widget.listener.onRemove(i);
             setState(() {});
           } else {
             cardStates[i] = task_card.BeingUnpinned(

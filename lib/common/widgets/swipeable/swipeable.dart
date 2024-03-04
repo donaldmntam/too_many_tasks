@@ -85,7 +85,7 @@ class _State extends widgets.State<Swipeable>
       case Dragging(initialOffset: final initialOffset):
         final currentOffset = clampDouble(
           details.localPosition.dx,
-          0, // initialOffset - widget.threshold,
+          initialOffset,
           initialOffset + widget.swipeDistance,
         );
         final newState = Dragging(initialOffset, currentOffset);

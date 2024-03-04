@@ -120,17 +120,17 @@ List<Widget> widgets({
   widgets.add(const SizedBox(height: taskListPadding));
   widgets.addAll(pinnedWidgets);
   if (pinnedWidgets.isNotEmpty && unpinnedWidgets.isNotEmpty) {
-    widgets.add(
-      Padding(
-        padding: const EdgeInsets.symmetric(
-          vertical: taskListItemSpacing,
-          horizontal: taskListPadding,
-        ),
-        child: Divider(
-          color: theme.colors.onBackground900,
-        )
-      )
-    );
+    // widgets.add(
+    //   Padding(
+    //     padding: const EdgeInsets.symmetric(
+    //       vertical: taskListItemSpacing,
+    //       horizontal: taskListPadding,
+    //     ),
+    //     child: Divider(
+    //       color: theme.colors.onBackground900,
+    //     )
+    //   )
+    // );
   }
   widgets.addAll(unpinnedWidgets);
   widgets.add(

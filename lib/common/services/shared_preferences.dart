@@ -92,7 +92,10 @@ extension ExtendedSharedPreferences on SharedPreferences {
   Future<Result<Unit>> setTasksWithTaskStates(
     TaskStates taskStates
   ) async {
-    final json = taskStates.toJson((state) => taskToJson(state.task));
+    final json = taskStates
+      .where((state) => !state.removed)
+      .toIList()
+      .toJson((state) => taskToJson(state.task));
 
     final stringResult = tryJsonEncode(json);
     if (stringResult is Err) return stringResult;

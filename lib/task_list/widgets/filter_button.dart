@@ -3,6 +3,8 @@ import 'package:too_many_tasks/common/theme/theme.dart';
 import 'package:flutter_gen/gen_l10n/strings.dart';
 
 class FilterButton extends StatelessWidget {
+  const FilterButton({super.key});
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);

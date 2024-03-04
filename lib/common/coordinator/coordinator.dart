@@ -47,7 +47,8 @@ class _WidgetState extends flutter.State<Coordinator> {
     final state = _state;
     final taskStates = state.taskStates;
     if (taskStates is! Ready<TaskStates>) return;
-    final result = await widget.sharedPrefs.setTasksWithTaskStates(taskStates.value);
+    final result = await widget.sharedPrefs
+      .setTasksWithTaskStates(taskStates.value);
     print('result here! ${result.toPrettyString()}');
   }
 
