@@ -1,9 +1,8 @@
-// no longer used
-import 'dart:math';
-
 import 'package:too_many_tasks/common/functions/list_functions.dart';
 import 'package:too_many_tasks/common/models/task.dart';
 import 'package:too_many_tasks/task_list/widgets/task_card/state.dart' as task_card;
+import 'package:fast_immutable_collections/fast_immutable_collections.dart';
+import '../widgets/filter.dart';
 
 bool taskIsPinned({required int index, required int pinnedCount}) {
   return index < pinnedCount;

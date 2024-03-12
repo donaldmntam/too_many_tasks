@@ -31,12 +31,14 @@ class Theme extends InheritedWidget {
     required double size,
     FontWeight weight = FontWeight.w400,
     required Color color,
+    TextDecoration decoration = TextDecoration.none,
   }) {
     return TextStyle(
       color: color,
       fontSize: size,
       fontWeight: weight,
       fontFamily: fontFamily,
+      decoration: decoration,
     );
   }
 

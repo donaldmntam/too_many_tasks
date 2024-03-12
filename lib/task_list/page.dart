@@ -1,5 +1,5 @@
 import 'package:fast_immutable_collections/fast_immutable_collections.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide BottomSheet, Theme;
 import 'package:too_many_tasks/common/functions/error_functions.dart';
 import 'package:too_many_tasks/common/functions/tasks_functions.dart';
 import 'package:too_many_tasks/common/models/task.dart';
@@ -11,6 +11,12 @@ import 'package:too_many_tasks/task_list/widgets/top/top.dart';
 import '../common/models/loadable.dart';
 import 'widgets/ready_content/ready_content.dart' as ready;
 import './widgets/loading_content.dart'as loading;
+import './widgets/filter.dart';
+import 'package:too_many_tasks/common/overlay/bottom_sheet.dart';
+import './widgets/filter_menu.dart';
+import 'package:too_many_tasks/common/overlay/service.dart';
+import 'package:too_many_tasks/common/theme/theme.dart';
+import 'dart:async';
 
 // TODO: animation when task is updated
 // TODO: loading state
@@ -52,7 +58,9 @@ class Page extends StatefulWidget {
 }
 
 class _State extends State<Page> {
-    @override
+  Filter? filter;
+
+  @override
   void initState() {
     super.initState();
   }
@@ -80,6 +88,29 @@ class _State extends State<Page> {
     ) as Task?;
     if (newTask == null) return;
     widget.listener.onEditTask(index, newTask);
+  }
+
+  void openFilterMenu() async {
+    final overlay = OverlayService.of(context);
+    final theme = Theme.of(context);
+
+    final completer = Completer<Filter?>();
+    overlay.openBottomSheet(
+      BottomSheet(builder: (context) =>
+        Container(
+          width: double.infinity,
+          decoration: theme.bottomSheetDecoration,
+          child: FilterMenu(
+            initialChosenFilter: filter,
+            shouldUpdateFilter: completer.complete,
+          ),
+        ),
+      ),
+    );
+    final newChosenFilter = await completer.future;
+    overlay.closeBottomSheet();
+    filter = newChosenFilter;
+    setState(() {});
   }
 
   @override
@@ -121,7 +152,7 @@ class _State extends State<Page> {
                       child: FittedBox(
                         fit: BoxFit.contain,
                         alignment: Alignment.centerRight,
-                        child: FilterButton()
+                        child: FilterButton(onTap: openFilterMenu)
                       )
                     ),
                     Error() => todo(),

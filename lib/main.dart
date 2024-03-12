@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart' hide Theme, Page, Localizations;
+import 'package:flutter/material.dart' hide Theme, Page, Localizations, Overlay;
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:too_many_tasks/common/coordinator/coordinator.dart';
 import 'package:too_many_tasks/common/services/app_cycle_message_stream.dart';
@@ -8,6 +8,7 @@ import 'package:flutter_gen/gen_l10n/strings.dart';
 
 import 'common/services/services.dart';
 import 'common/theme/theme.dart';
+import 'common/overlay/overlay.dart';
 
 void main() {
   runApp(const MainApp());
@@ -51,9 +52,11 @@ class MainApp extends StatelessWidget {
           supportedLocales: [
             Locale('en'),
           ],
-          home: Coordinator(
-            sharedPreferences: sharedPreferences,
-          )
+          home: Overlay(
+            child: Coordinator(
+              sharedPreferences: sharedPreferences,
+            ),
+          ),
         )
       ),
     );
