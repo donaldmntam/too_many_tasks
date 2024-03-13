@@ -76,4 +76,5 @@ const testColors = (
   disabled: Color(0xFFA4A2A0),
   onDisabled: Color(0xFFFFFFFF),
   error: Color(0xFFFF0029),
+  onError: Color(0xFFFFFFFF),
 );

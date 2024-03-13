@@ -143,24 +143,26 @@ class _State extends State<Page> {
                     + Page.clipboardOverlapHeight,
                   topRightChild: switch (tasks) {
                     Loading() => null,
-                    Ready() => Padding(
-                      padding: const EdgeInsets.only(
-                        top: 12,
-                        left: Page.clipboardBorderRadius,
-                        right: Page.clipboardBorderRadius,
-                      ),
-                      child: FittedBox(
-                        fit: BoxFit.contain,
-                        alignment: Alignment.centerRight,
-                        child: FilterButton(onTap: openFilterMenu)
-                      )
-                    ),
+                    Ready() => null,
+                    // Ready() => Padding(
+                    //   padding: const EdgeInsets.only(
+                    //     top: 12,
+                    //     left: Page.clipboardBorderRadius,
+                    //     right: Page.clipboardBorderRadius,
+                    //   ),
+                    //   child: FittedBox(
+                    //     fit: BoxFit.contain,
+                    //     alignment: Alignment.centerRight,
+                    //     child: FilterButton(onTap: openFilterMenu)
+                    //   )
+                    // ),
                     Error() => todo(),
                   },
                   child: switch (tasks) {
                     Loading() => const loading.Content(),
                     Ready(value: final taskStates) => ready.Content(
                       taskStates: taskStates,
+                      filter: filter,
                       listener: (
                         onEditPressed: onEditTask,
                         onCheckMarkPressed: widget.listener.onCheckTask,

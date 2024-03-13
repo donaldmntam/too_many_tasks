@@ -1,5 +1,5 @@
 import 'package:flutter/widgets.dart';
-import 'package:flutter/material.dart' show Icons, Colors;
+import 'package:flutter/material.dart' show Icons;
 import 'package:too_many_tasks/common/overlay/bottom_sheet.dart';
 import 'package:too_many_tasks/common/theme/theme.dart';
 import 'package:too_many_tasks/common/functions/list_functions.dart';
@@ -48,9 +48,9 @@ class _State extends State<FilterMenu> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            _ClearButtonItem(chosenFilter != null, onTap),
+            _NoFilterButtonItem(chosenFilter != null, onTap),
             _FilterItem(const DueToday(), chosenFilter, onTap),
-            _FilterItem(const Paused(), chosenFilter, onTap),
+            // _FilterItem(const Paused(), chosenFilter, onTap),
             _FilterItem(const Overdue(), chosenFilter, onTap),
           ].surroundEach((_) => const SizedBox(height: 16)),
         ),
@@ -59,11 +59,11 @@ class _State extends State<FilterMenu> {
   }
 }
 
-class _ClearButtonItem extends StatelessWidget {
+class _NoFilterButtonItem extends StatelessWidget {
   final bool hasFilterChosen;
   final void Function(Filter?) onTap;
 
-  const _ClearButtonItem(
+  const _NoFilterButtonItem(
     this.hasFilterChosen,
     this.onTap,
   );
@@ -72,7 +72,7 @@ class _ClearButtonItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return _Item(
       // TODO: translation
-      'Clear',
+      'None',
       !hasFilterChosen,
       () => onTap(null),
     );

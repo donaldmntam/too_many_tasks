@@ -1,9 +1,6 @@
 import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:shared_preferences/shared_preferences.dart' as package;
-import 'package:too_many_tasks/common/functions/iterable_functions.dart';
 import 'package:too_many_tasks/common/functions/json_functions.dart';
-import 'package:too_many_tasks/common/functions/nullable_functions.dart';
-import 'package:too_many_tasks/common/functions/scope_functions.dart';
 import 'package:too_many_tasks/common/models/task.dart';
 import 'package:too_many_tasks/common/models/unit.dart';
 import 'package:too_many_tasks/common/monads/optional.dart';

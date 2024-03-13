@@ -243,6 +243,7 @@ class _DueDate extends StatelessWidget {
   }
 }
 
+const opacityCurve = Curves.easeInQuad;
 class _SwipeableBackground extends StatelessWidget {
   final BackgroundBuilderDetails details;
 
@@ -250,18 +251,43 @@ class _SwipeableBackground extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Container(
+      // color: switch (details) {
+      //   DraggingBackgroundBuilderDetails(
+      //     animationValue: final relativeOffset,
+      //   ) => Color.fromARGB((255 * relativeOffset).toInt(), 0, 0, 0),
+      //   ReleasedBackgroundBuilderDetails(
+      //     thresholdReached: final thresholdReached,
+      //   ) => thresholdReached ? Colors.green : Colors.red,
+      // },
       color: switch (details) {
-        DraggingBackgroundBuilderDetails(
-          animationValue: final relativeOffset,
-        ) => Color.fromARGB((255 * relativeOffset).toInt(), 0, 0, 0),
+        DraggingBackgroundBuilderDetails() => theme.colors.surface,
         ReleasedBackgroundBuilderDetails(
           thresholdReached: final thresholdReached,
-        ) => thresholdReached ? Colors.green : Colors.red,
+        ) => thresholdReached ? Colors.red : theme.colors.surface,
       },
-      child: const Icon(
-        Icons.abc,
-        color: Colors.black,
+      child: Opacity(
+        opacity: switch (details) {
+          DraggingBackgroundBuilderDetails(
+            animationValue: final animationValue
+          ) => opacityCurve.transform(animationValue),
+          ReleasedBackgroundBuilderDetails(
+            animationValue: final animationValue,
+            thresholdReached: final thresholdReached,
+          ) => thresholdReached ? 1 : opacityCurve.transform(animationValue),
+        },
+        child: Icon(
+          Icons.delete,
+          color: switch (details) {
+            DraggingBackgroundBuilderDetails() => theme.colors.error,
+            ReleasedBackgroundBuilderDetails(
+              thresholdReached: final thresholdReached,
+            ) => thresholdReached 
+              ? theme.colors.onError
+              : theme.colors.onBackground900,
+          },
+        )
       )
     );
   }

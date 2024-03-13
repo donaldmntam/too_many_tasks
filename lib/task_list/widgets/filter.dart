@@ -13,10 +13,6 @@ class Overdue implements Filter {
 
 extension ExtendedFilter on Filter {
   bool isSameFilterAs(Filter other) {
-    final self = this;
-    if (self is DueToday && other is DueToday) return true;
-    if (self is Paused && other is Paused) return true;
-    if (self is Overdue && other is Overdue) return true;
     switch (this) {
       case DueToday():
         return other is DueToday;
@@ -24,6 +20,8 @@ extension ExtendedFilter on Filter {
         return other is Paused;
       case Overdue():
         return other is Overdue;
+      default:
+        return false;
     }
   }
 
@@ -46,7 +44,7 @@ extension ExtendedFilter on Filter {
       case Paused():
         return (_) => false;
       case Overdue():
-        return (task) => task.dueDate.isAfter(today);
+        return (task) => task.dueDate.isBefore(today);
     }
   }
 }

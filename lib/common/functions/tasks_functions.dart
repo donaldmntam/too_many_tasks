@@ -11,10 +11,11 @@ extension ExtendedTasks on Iterable<Task> {
 
 extension ExtendedTaskStates on Iterable<TaskState> {
   double get progress {
-    final length = this.length;
+    final nonRemoved = where((e) => !e.removed);
+    
+    final length = nonRemoved.length;
     if (length == 0) return 0;
 
-    final nonRemoved = where((e) => !e.removed);
     return nonRemoved.countIf((e) => e.task.done) /
       nonRemoved.length;
   }

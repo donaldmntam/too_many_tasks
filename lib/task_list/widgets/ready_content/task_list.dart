@@ -1,6 +1,3 @@
-import 'dart:developer';
-
-import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:flutter/material.dart' hide State, Theme;
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart' as widgets show State;
@@ -8,18 +5,18 @@ import 'package:too_many_tasks/common/functions/iterable_functions.dart';
 import 'package:too_many_tasks/common/models/task.dart';
 import 'package:too_many_tasks/common/services/services.dart';
 import 'package:too_many_tasks/common/theme/theme.dart';
-import 'package:too_many_tasks/task_list/data/widget_data.dart';
 import 'package:too_many_tasks/task_list/functions/widget_functions.dart' as functions;
-import 'package:too_many_tasks/task_list/listener.dart';
 import 'package:too_many_tasks/task_list/widgets/task_card/task_card.dart' as task_card;
 import 'package:too_many_tasks/task_list/widgets/task_card/state.dart' as task_card;
 import 'package:too_many_tasks/task_list/functions/task_functions.dart' as functions;
+import 'package:too_many_tasks/task_list/widgets/filter.dart';
 
 const _addAnimationDuration = Duration(milliseconds: 500);
 const _removeAnimationDuration = Duration(milliseconds: 500);
 
 class TaskList extends StatefulWidget {
   final TaskStates taskStates;
+  final Filter? filter;
   final double bottomPadding;
   final task_card.Listener listener;
   final ScrollController scrollController;
@@ -27,6 +24,7 @@ class TaskList extends StatefulWidget {
   const TaskList({
     super.key,
     required this.taskStates,
+    required this.filter,
     required this.bottomPadding,
     required this.listener,
     required this.scrollController,
@@ -80,6 +78,7 @@ class _TaskListState extends widgets.State<TaskList>
     super.didUpdateWidget(oldWidget);
   }
 
+  // TODO: pinning
   void onTick(Duration _) {
     for (var i = 0; i < cardStates.length; i++) {
       final cardState = cardStates[i];
@@ -144,7 +143,7 @@ class _TaskListState extends widgets.State<TaskList>
           ) / _removeAnimationDuration.inMilliseconds;
           if (animationValue > 1.0) {
             cardStates[i] = const task_card.Unpinned();
-            widget.listener.onRemove(i);
+            // widget.listener.onPinPressed(i);
             setState(() {});
           } else {
             cardStates[i] = task_card.BeingUnpinned(
@@ -160,11 +159,14 @@ class _TaskListState extends widgets.State<TaskList>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final services = Services.of(context);
 
     final widgets = functions.widgets(
+      today: services.calendar.today(),
       bottomPadding: widget.bottomPadding,
       theme: theme,
       taskStates: widget.taskStates,
+      filter: widget.filter,
       cardStates: cardStates,
       listener: widget.listener,
     );
@@ -177,7 +179,7 @@ class _TaskListState extends widgets.State<TaskList>
           itemCount: widgets.length,
           itemBuilder: (_, index) => widgets[index],
         )),
-        ElevatedButton(onPressed: () => print("cardStates here! ${inspect(cardStates)}"), child: Text("inspect"))
+        // ElevatedButton(onPressed: () => print("cardStates here! ${inspect(cardStates)}"), child: Text("inspect"))
       ],
     );
   }

@@ -13,4 +13,5 @@ typedef Colors = ({
   Color disabled,
   Color onDisabled,
   Color error,
+  Color onError,
 });
