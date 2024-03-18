@@ -4,7 +4,6 @@ import 'dart:ui';
 import 'package:flutter/material.dart' hide State;
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart' as widgets show State;
-import 'package:too_many_tasks/common/functions/scope_functions.dart';
 import 'package:too_many_tasks/common/widgets/swipeable/swipeable_clipper.dart';
 import 'package:too_many_tasks/common/widgets/swipeable/details.dart';
 import 'package:too_many_tasks/common/widgets/swipeable/state.dart';
@@ -17,7 +16,9 @@ class Swipeable extends StatefulWidget {
   final double swipeDistance;
   final double swipeThreshold;
   final WidgetBuilder leftBackgroundBuilder;
-  final void Function() onThresholdReached;
+  // final WidgetBuilder rightBackgroundBuilder;
+  final void Function() onFullySwipedLeft;
+  // final void Function() onFullySwipedRight;
   final Widget child;
 
   const Swipeable({
@@ -27,7 +28,9 @@ class Swipeable extends StatefulWidget {
     this.swipeThreshold = 75.0,
     this.swipeDistance = 80.0,
     required this.leftBackgroundBuilder,
-    required this.onThresholdReached,
+    // required this.rightBackgroundBuilder,
+    required this.onFullySwipedLeft,
+    // required this.onFullySwipedRight,
     required this.child,
   });
 
@@ -113,7 +116,7 @@ class _State extends widgets.State<Swipeable>
         setState(() {});
         ticker.start();
         if (newState.thresholdReached(widget.swipeThreshold)) {
-          widget.onThresholdReached();
+          widget.onFullySwipedLeft();
         }
       case Idling():
       case Released():

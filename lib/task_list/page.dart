@@ -113,6 +113,7 @@ class _State extends State<Page> {
             shouldUpdateFilter: completer.complete,
           ),
         ),
+        onTapBackdrop: () => overlay.closeBottomSheet(),
       ),
     );
     final newChosenFilter = await completer.future;
@@ -190,8 +191,9 @@ class _State extends State<Page> {
                   child: SizedBox.square(
                     dimension: _fabSize,
                     child: FloatingActionButton(
-                      backgroundColor: theme.colors.surface,
-                      foregroundColor: theme.colors.onBackground400,
+                      shape: const CircleBorder(),
+                      backgroundColor: theme.colors.secondary,
+                      foregroundColor: theme.colors.onSecondary,
                       onPressed: onFabTap,
                       child: const Icon(
                         Icons.add,

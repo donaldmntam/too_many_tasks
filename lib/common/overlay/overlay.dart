@@ -13,23 +13,26 @@ class Overlay extends StatefulWidget {
 }
 
 class _State extends State<Overlay> {
-  BottomSheet? _speechBubble;
+  BottomSheet? _bottomSheet;
 
-  void shouldSetSpeechBubble(BottomSheet? speechBubble) {
-    _speechBubble = speechBubble;
+  void shouldSetBottomSheet(BottomSheet? speechBubble) {
+    _bottomSheet = speechBubble;
     setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
-    final bottomSheet = _speechBubble;
+    final bottomSheet = _bottomSheet;
 
     return OverlayService(
-      shouldSetBottomSheet: shouldSetSpeechBubble,
+      shouldSetBottomSheet: shouldSetBottomSheet,
       child: Stack(
         children: [
           widget.child,
-          Backdrop(enabled: _speechBubble != null),
+          Backdrop(
+            enabled: _bottomSheet != null,
+            onTap: _bottomSheet?.onTapBackdrop,
+          ),
           if (bottomSheet != null) Align(
             alignment: Alignment.bottomCenter,
             child: bottomSheet.builder(context),

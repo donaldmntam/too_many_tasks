@@ -91,7 +91,7 @@ class _Background extends StatelessWidget {
         ),
         child: Swipeable(
           leftBackgroundBuilder: _SwipeableBackground.new,
-          onThresholdReached: () => listener.onRemove(task.id),
+          onFullySwipedLeft: () => listener.onRemove(task.id),
           child: Container(
             clipBehavior: Clip.antiAlias,
             decoration: BoxDecoration(

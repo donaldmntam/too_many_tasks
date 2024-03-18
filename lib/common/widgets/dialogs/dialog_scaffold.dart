@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart' hide Theme;
 import 'package:too_many_tasks/common/theme/theme.dart';
 import 'package:too_many_tasks/common/widgets/tappable/tappable.dart';
+import 'package:too_many_tasks/common/widgets/highlighted/highlighted.dart';
 
 const _buttonSize = 32.0;
 const _columnSpacing = 16.0;
@@ -31,7 +32,7 @@ class DialogScaffold extends StatelessWidget {
               child: Row(
                 children: [
                   const SizedBox(width: _buttonSize + _rowSpacing),
-                  Flexible(flex: 1, child: _Title(title)),
+                  Flexible(flex: 1, child: Highlighted(title)),
                   const SizedBox(width: _rowSpacing),
                   SizedBox(
                     width: _buttonSize,
@@ -52,46 +53,6 @@ class DialogScaffold extends StatelessWidget {
           ]
         );
       }
-    );
-  }
-}
-
-class _Title extends StatelessWidget {
-  final String text;
-
-  const _Title(this.text);
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Align(
-      alignment: Alignment.center,
-      child: IntrinsicWidth(
-        child: IntrinsicHeight(
-          child: Stack(
-            children: [
-              Align(
-                alignment: Alignment.bottomCenter,
-                child: FractionallySizedBox(
-                  heightFactor: 0.6,
-                  widthFactor: 1.0,
-                  child: Container(
-                    color: theme.colors.primary.withAlpha((255 * 0.5).toInt())
-                  ),
-                ),
-              ),
-              Text(
-                text,
-                style: theme.textStyle(
-                  size: 16,
-                  weight: FontWeight.w500,
-                  color: theme.colors.onBackground400,
-                ),
-              )
-            ]
-          ),
-        ),
-      ),
     );
   }
 }

@@ -32,6 +32,8 @@ class Theme extends InheritedWidget {
     FontWeight weight = FontWeight.w400,
     required Color color,
     TextDecoration decoration = TextDecoration.none,
+    Color? decorationColor,
+    TextDecorationStyle? decorationStyle,
   }) {
     return TextStyle(
       color: color,
@@ -39,6 +41,8 @@ class Theme extends InheritedWidget {
       fontWeight: weight,
       fontFamily: fontFamily,
       decoration: decoration,
+      decorationColor: decorationColor ?? colors.primary,
+      decorationStyle: decorationStyle ?? TextDecorationStyle.solid,
     );
   }
 

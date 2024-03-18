@@ -2,8 +2,10 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter/material.dart' show Icons;
 import 'package:too_many_tasks/common/overlay/bottom_sheet.dart';
 import 'package:too_many_tasks/common/theme/theme.dart';
-import 'package:too_many_tasks/common/functions/list_functions.dart';
 import './filter.dart';
+import 'package:too_many_tasks/common/widgets/highlighted/highlighted.dart';
+
+Color textColor(Theme theme) => theme.colors.onBackground400;
 
 class FilterMenu extends StatefulWidget {
   final Filter? initialChosenFilter;
@@ -41,20 +43,56 @@ class _State extends State<FilterMenu> {
     return SafeArea(
       top: false,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
+        padding: const EdgeInsets.symmetric(horizontal: 24),
         width: double.infinity,
         decoration: theme.bottomSheetDecoration,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
+            const SizedBox(height: 36),
+            const _TitleItem(),
+            const SizedBox(height: 36),
             _NoFilterButtonItem(chosenFilter != null, onTap),
+            const SizedBox(height: 16),
             _FilterItem(const DueToday(), chosenFilter, onTap),
-            // _FilterItem(const Paused(), chosenFilter, onTap),
+            const SizedBox(height: 16),
             _FilterItem(const Overdue(), chosenFilter, onTap),
-          ].surroundEach((_) => const SizedBox(height: 16)),
+            const SizedBox(height: 24),
+          ],
         ),
       ),
+    );
+  }
+}
+
+class _TitleItem extends StatelessWidget {
+  const _TitleItem();
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        // Icon(
+        //   Icons.filter_alt_outlined,
+        //   color: theme.colors.onBackground400,
+        //   size: 32,
+        // ),
+        // const SizedBox(width: 10),
+        Highlighted(
+          // TODO: translation
+          'Filter',
+          style: theme.textStyle(
+            size: 24,
+            color: textColor(theme),
+            weight: FontWeight.bold,
+            // decoration: TextDecoration.underline,
+            // decorationStyle: TextDecorationStyle.wavy,
+          ),
+        ),
+      ],
     );
   }
 }
@@ -120,6 +158,7 @@ class _Item extends StatelessWidget {
         children: [
           Icon(
             size: 26,
+            color: theme.colors.primary,
             chosen 
               ? Icons.radio_button_checked
               : Icons.radio_button_unchecked,
@@ -128,7 +167,7 @@ class _Item extends StatelessWidget {
           Text(
             title,
             style: theme.textStyle(
-              color: theme.colors.onBackground400,
+              color: textColor(theme),
               size: 18,
             ),
           ),
