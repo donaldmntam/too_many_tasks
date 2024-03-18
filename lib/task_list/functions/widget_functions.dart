@@ -87,8 +87,8 @@ List<Widget> widgets({
   for (var index = 0; index < filteredCardStates.length; index++) {
     final cardState = filteredCardStates[index];
     final task = filteredTaskStates[index].task;
-    final taskIsFiltered = filter != null && filter.predicate(today)(task);
-    if (taskIsFiltered) continue;
+    // final taskIsFiltered = filter != null && filter.predicate(today)(task);
+    // if (taskIsFiltered) continue;
     final double visibility = switch (cardState) {
       task_card.Pinned() => 1,
       task_card.BeingPinned() => cardState.animationValue,
@@ -188,7 +188,7 @@ Widget _taskItemWidget({
       heightProportion: heightProportion,
       child: Opacity(
         opacity: opacity,
-        child: task_card.TaskCard(index, task, listener),
+        child: task_card.TaskCard(task, listener),
       )
     ),
   );

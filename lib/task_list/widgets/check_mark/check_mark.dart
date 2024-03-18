@@ -8,12 +8,10 @@ import 'package:too_many_tasks/task_list/widgets/task_card/task_card.dart';
 const _checkboxSize = 42.0;
 
 class CheckMark extends StatefulWidget {
-  final int index;
   final Task task;
   final Listener listener;
 
   const CheckMark(
-    this.index,
     this.task,
     this.listener,
     {super.key}
@@ -70,7 +68,7 @@ class _CheckMarkState extends State<CheckMark> with TickerProviderStateMixin {
   widgets.Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return GestureDetector(
-      onTap: () => widget.listener.onCheckMarkPressed(widget.index),
+      onTap: () => widget.listener.onCheckMarkPressed(widget.task.id),
       child: SizedBox(
         width: _checkboxSize,
         height: _checkboxSize,

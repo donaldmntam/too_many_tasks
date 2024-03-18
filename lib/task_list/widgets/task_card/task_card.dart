@@ -16,18 +16,18 @@ final _borderRadius = BorderRadius.circular(12);
 const _padding = EdgeInsets.all(14);
 
 typedef Listener = ({
-  void Function(int index) onPinPressed,
-  void Function(int index) onEditPressed,
-  void Function(int index) onCheckMarkPressed,
-  void Function(int index) onRemove,
+  void Function(int id) onPinPressed,
+  void Function(int id) onEditPressed,
+  void Function(int id) onCheckMarkPressed,
+  void Function(int id) onRemove,
 });
 
 extension ExtendedListener on Listener {
   Listener copy({
-    void Function(int index)? onPinPressed,
-    void Function(int index)? onEditPressed,
-    void Function(int index)? onCheckMarkPressed,
-    void Function(int index)? onRemove,
+    void Function(int id)? onPinPressed,
+    void Function(int id)? onEditPressed,
+    void Function(int id)? onCheckMarkPressed,
+    void Function(int id)? onRemove,
   }) => (
     onPinPressed: onPinPressed ?? this.onPinPressed,
     onEditPressed: onEditPressed ?? this.onEditPressed,
@@ -37,12 +37,10 @@ extension ExtendedListener on Listener {
 }
 
 class TaskCard extends StatelessWidget {
-  final int index;
   final Task task;
   final Listener listener;
 
   const TaskCard(
-    this.index,
     this.task,
     this.listener,
     {super.key}
@@ -51,7 +49,6 @@ class TaskCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _Background(   
-      index: index,     
       task: task,
       listener: listener,
       child: Padding(
@@ -61,9 +58,9 @@ class TaskCard extends StatelessWidget {
             Flexible(
               flex: 1,
               fit: FlexFit.tight,
-              child: _Body(index, task, listener),
+              child: _Body(task, listener),
             ),
-            CheckMark(index, task, listener),
+            CheckMark(task, listener),
           ]
         ),
       )
@@ -72,13 +69,11 @@ class TaskCard extends StatelessWidget {
 }
 
 class _Background extends StatelessWidget {
-  final int index;
   final Task task;
   final Listener listener;
   final Widget child;
 
   const _Background({
-    required this.index,
     required this.task,
     required this.listener,
     required this.child
@@ -96,7 +91,7 @@ class _Background extends StatelessWidget {
         ),
         child: Swipeable(
           leftBackgroundBuilder: _SwipeableBackground.new,
-          onThresholdReached: () => listener.onRemove(index),
+          onThresholdReached: () => listener.onRemove(task.id),
           child: Container(
             clipBehavior: Clip.antiAlias,
             decoration: BoxDecoration(
@@ -121,12 +116,10 @@ class _Background extends StatelessWidget {
 }
 
 class _Body extends StatelessWidget {
-  final int index;
   final Task task;
   final Listener listener;
 
   const _Body(
-    this.index,
     this.task,
     this.listener,
   );
@@ -136,21 +129,19 @@ class _Body extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _Title(index, task, listener),
+        _Title(task, listener),
         const SizedBox(height: 8),
-        _DueDate(index, task),
+        _DueDate(task),
       ]
     );
   }
 }
 
 class _Title extends StatelessWidget {
-  final int index;
   final Task task;
   final Listener listener;
 
   const _Title(
-    this.index,
     this.task,
     this.listener,
   );
@@ -162,7 +153,7 @@ class _Title extends StatelessWidget {
     return Row(
       children: [
         GestureDetector(
-          onTap: () => listener.onPinPressed(index),
+          onTap: () => listener.onPinPressed(task.id),
           child: Transform.rotate(
             angle: task.pinned ? 0 : pi * 0.5 * 3.5,
             child: Icon(
@@ -185,7 +176,7 @@ class _Title extends StatelessWidget {
         ),
         SizedBox(width: 4 * media.textScaleFactor),
         GestureDetector(
-          onTap: () => listener.onEditPressed(index),
+          onTap: () => listener.onEditPressed(task.id),
           child: Icon(
             Icons.edit_outlined,
             size: 18 * media.textScaleFactor,
@@ -198,10 +189,9 @@ class _Title extends StatelessWidget {
 }
 
 class _DueDate extends StatelessWidget {
-  final int number;
   final Task task;
 
-  const _DueDate(this.number, this.task);
+  const _DueDate(this.task);
 
   @override
   Widget build(BuildContext context) {
@@ -285,7 +275,7 @@ class _SwipeableBackground extends StatelessWidget {
               thresholdReached: final thresholdReached,
             ) => thresholdReached 
               ? theme.colors.onError
-              : theme.colors.onBackground900,
+              : theme.colors.error,
           },
         )
       )

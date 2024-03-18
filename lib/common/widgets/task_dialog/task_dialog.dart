@@ -15,6 +15,7 @@ import 'package:flutter_gen/gen_l10n/strings.dart';
 
 import '../dialogs/dialog.dart';
 import '../dialogs/dialog_scaffold.dart';
+import './types.dart';
 
 const _fieldPadding = EdgeInsets.symmetric(horizontal: 10, vertical: 8);
 const _spacing = 12.0;
@@ -121,10 +122,8 @@ class _TaskDialogState extends State<TaskDialog> {
                     final name = nameController.text;
                     final dueDate = this.dueDate;
                     if (name.isEmpty || dueDate == null) return null;
-                    print("enabled!");
                     return () {
-                      print("onPress here!");
-                      navigator.pop<Task>(
+                      navigator.pop<Result>(
                         (
                           name: nameController.text,
                           dueDate: dueDate,

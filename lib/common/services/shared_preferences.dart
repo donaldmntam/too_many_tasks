@@ -101,4 +101,23 @@ extension ExtendedSharedPreferences on SharedPreferences {
     setString(SharedPrefsKeys.tasks, string);
     return const Result.ok(unit);
   }
+
+  Future<Result<Optional<int>>> getNextAvailableTaskId() async {
+    final string = await getString(SharedPrefsKeys.nextAvailableTaskId);
+    if (string is Err) return string;
+    final optional = string.unwrap();
+    if (optional is None) return const Result.ok(Optional.none);
+    final integer = int.tryParse(optional.unwrap());
+    if (integer == null) {
+      return Result.err(
+        '\'${optional.unwrap()}\' is not a valid integer'
+      );
+    }
+    return Result.ok(Optional.some(integer));
+  }
+
+  Future<Result<Unit>> setNextAvailableTaskId(int id) async {
+    await setString(SharedPrefsKeys.nextAvailableTaskId, id.toString());
+    return const Result.ok(unit);
+  }
 }

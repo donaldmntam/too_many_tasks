@@ -4,6 +4,7 @@ import 'package:too_many_tasks/common/monads/result.dart';
 import 'package:too_many_tasks/common/typedefs/json.dart';
 
 typedef Task = ({
+  int id,
   String name,
   DateTime dueDate,
   bool done,
@@ -21,11 +22,13 @@ typedef TaskStates = IList<TaskState>;
 
 extension ExtendedTask on Task {
   Task copy({
+    int? id,
     String? name,
     DateTime? dueDate,
     bool? done,
     bool? pinned,
   }) => (
+    id: id ?? this.id,
     name: name ?? this.name,
     dueDate: dueDate ?? this.dueDate,
     done: done ?? this.done,
@@ -33,11 +36,13 @@ extension ExtendedTask on Task {
   );
 
   Task copyBy({
+    int Function(int)? id,
     String Function(String)? name,
     DateTime Function(DateTime)? dueDate,
     bool Function(bool)? done,
     bool Function(bool)? pinned,
   }) => (
+    id: id?.call(this.id) ?? this.id,
     name: name?.call(this.name) ?? this.name,
     dueDate: dueDate?.call(this.dueDate) ?? this.dueDate,
     done: done?.call(this.done) ?? this.done,
@@ -72,6 +77,7 @@ extension ExtendedTaskState on TaskState {
 
 Json taskToJson(Task task) {
   return {
+    "id": task.id,
     "name": task.name,
     "dueDate": task.dueDate.toIso8601String(),
     "done": task.done,
@@ -82,6 +88,7 @@ Json taskToJson(Task task) {
 Result<Task> jsonToTask(Json json) {
   if (
     json case {
+      "id": int id,
       "name": String name,
       "dueDate": String dueDateEncoded,
       "done": bool done,
@@ -93,6 +100,7 @@ Result<Task> jsonToTask(Json json) {
       return Err(jsonErrorMessage("Task", json));
     }
     return Ok((
+      id: id,
       name: name,
       dueDate: dueDate,
       done: done,

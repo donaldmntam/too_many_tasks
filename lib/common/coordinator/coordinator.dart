@@ -11,6 +11,9 @@ import 'package:too_many_tasks/task_list/models/message.dart' as task_list;
 import 'package:too_many_tasks/task_list/page.dart' as task_list;
 import 'functions.dart';
 import 'state.dart';
+import 'package:too_many_tasks/common/widgets/task_dialog/types.dart' as task_dialog;
+import 'package:too_many_tasks/common/monads/optional.dart';
+import 'package:too_many_tasks/common/functions/iterable_functions.dart';
 
 class Coordinator extends flutter.StatefulWidget {
   final SharedPreferences sharedPrefs;
@@ -32,6 +35,7 @@ class Coordinator extends flutter.StatefulWidget {
 
 class _WidgetState extends flutter.State<Coordinator> {
   late State _state;
+  late int _nextAvailableTaskId;
 
   @override
   void initState() {
@@ -40,46 +44,49 @@ class _WidgetState extends flutter.State<Coordinator> {
       taskStates: Loading(),
     );
     super.initState();
-    _loadTasks();
+    _loadDataFromSharedPrefs();
   }
 
-  Future<void> _saveTasksToSharedPrefs() async {
+  Future<void> _persistData() async {
     final state = _state;
     final taskStates = state.taskStates;
     if (taskStates is! Ready<TaskStates>) return;
-    final result = await widget.sharedPrefs
+    await widget.sharedPrefs
       .setTasksWithTaskStates(taskStates.value);
-    print('result here! ${result.toPrettyString()}');
+    await widget.sharedPrefs
+      .setNextAvailableTaskId(_nextAvailableTaskId);
   }
 
-  void _loadTasks() async {
+  void _loadDataFromSharedPrefs() async {
     final state = _state;
     final tasksState = state.taskStates;
     if (tasksState is! Loading) illegalState(state, "_loadTasks");
-    (await widget.sharedPrefs.getTasks()).match(
-      ok: _tasksDidLoad,
-      err: _tasksDidFailToLoad
+      
+    final loadTasksResult = await widget.sharedPrefs.getTasks();
+    if (loadTasksResult is Err) {
+      _didFailToLoadFromSharedPrefs(loadTasksResult.value);
+      return;
+    }
+
+    final loadNextAvailableTaskIdResult = await widget.sharedPrefs
+      .getNextAvailableTaskId();
+    if (loadNextAvailableTaskIdResult is Err) {
+      _didFailToLoadFromSharedPrefs(loadNextAvailableTaskIdResult.value);
+    }
+
+    _didLoadDataFromSharedPrefs(
+      loadNextAvailableTaskIdResult.unwrap().fold(() => 0),
+      loadTasksResult.unwrap(),
     );
   }
   
-  void _tasksDidLoad(IList<Task> loadedTasks) {
-    print('tasks did load here! ${loadedTasks.length}');
+  void _didLoadDataFromSharedPrefs(
+    int nextAvailableTaskId,
+    IList<Task> loadedTasks,
+  ) {
     final state = _state;
     final tasks = state.taskStates;
     if (tasks is! Loading) illegalState(state, "_tasksDidLoad");
-    // final newTasksState = tasks.TasksReady(tasks: loadedTasks);
-    final newTasksHardcoded = Ready(
-      <Task>[
-        (name: "Task 1", dueDate: DateTime.now(), done: false, pinned: false),
-        (name: "Task 2", dueDate: DateTime.now(), done: false, pinned: false),
-        (name: "Task 3", dueDate: DateTime.now(), done: false, pinned: false),
-        // (name: "Task 4", dueDate: DateTime.now(), done: false, pinned: false),
-        // (name: "Task 5", dueDate: DateTime.now(), done: false, pinned: false),
-        // (name: "Task 6", dueDate: DateTime.now(), done: false, pinned: false),
-        // (name: "Task 7", dueDate: DateTime.now(), done: false, pinned: false),
-        // (name: "Task 8", dueDate: DateTime.now(), done: false, pinned: false),
-      ].map<TaskState>((task) => (task: task, removed: false)).toIList(),
-    );
     final newTasks = loadedTasks
       .map<TaskState>((t) => (task: t, removed: false))
       .toIList();
@@ -87,10 +94,11 @@ class _WidgetState extends flutter.State<Coordinator> {
       taskStates: Ready(newTasks),
     );
     _state = newState;
+    _nextAvailableTaskId = nextAvailableTaskId;
     setState(() {});
   }
 
-  void _tasksDidFailToLoad(Object? error) {
+  void _didFailToLoadFromSharedPrefs(Object? error) {
     final state = _state;
     final tasks = state.taskStates;
     if (tasks is! Loading) {
@@ -151,9 +159,16 @@ class _WidgetState extends flutter.State<Coordinator> {
     
   }
 
-  void _addTask(Task task) {
+  void _addTask(task_dialog.Result dialogResult) {
     final state = _state;
     final taskStates = state.taskStates; 
+    final Task task = (
+      id: _nextAvailableTaskId,
+      name: dialogResult.name,
+      dueDate: dialogResult.dueDate,
+      done: dialogResult.done,
+      pinned: dialogResult.pinned,
+    );
     if (taskStates is! Ready<TaskStates>) illegalState(state, "_addTask");
     final newTaskStates = taskStates.copy(
       taskStates.value.add((task: task, removed: false))
@@ -163,17 +178,30 @@ class _WidgetState extends flutter.State<Coordinator> {
     );
     _state = newState;
     setState(() {});
-    _saveTasksToSharedPrefs();
+    _nextAvailableTaskId += 1;
+    _persistData();
   }
 
-  void _editTask(int index, Task task) {
+  void _editTask(int id, task_dialog.Result dialogResult) {
     final state = _state;
     final taskStates = state.taskStates;
     if (taskStates is! Ready<TaskStates>) illegalState(state, "_editTask");
-    if (taskStates.value[index].removed) illegalState(state, "_editTask");
+    final findResult = taskStates.value.find((t) => t.task.id == id);
+    if (findResult is None) illegalState(state, "_editTask");
+    final (_, taskState) = findResult.unwrap();
+    if (taskState.removed) {
+      illegalState(state, "_editTask");
+    }
+    final Task task = (
+      id: _nextAvailableTaskId,
+      name: dialogResult.name,
+      dueDate: dialogResult.dueDate,
+      done: dialogResult.done,
+      pinned: dialogResult.pinned,
+    );
     final newTaskStates = taskStates.copy(
       taskStates.value.replace(
-        index, 
+        id, 
         (task: task, removed: false)
       )
     );
@@ -182,14 +210,18 @@ class _WidgetState extends flutter.State<Coordinator> {
     );
     _state = newState;
     setState(() {});
-    _saveTasksToSharedPrefs();
+    _nextAvailableTaskId += 1;
+    _persistData();
   }
 
-  void _removeTask(int index) {
+  void _removeTask(int id) {
     final state = _state;
     final taskStates = state.taskStates;
     if (taskStates is! Ready<TaskStates>) illegalState(state, "_removeTask");
-    if (taskStates.value[index].removed) illegalState(state, "_removeTask");
+    final findResult = taskStates.value.find((t) => t.task.id == id);
+    if (findResult is None) illegalState(state, "_removeTask");
+    final (index, taskState) = findResult.unwrap();
+    if (taskState.removed) illegalState(state, "_removeTask");
     final newTaskStates = taskStates.copy(
       taskStates.value.replaceBy(
         index,
@@ -201,7 +233,7 @@ class _WidgetState extends flutter.State<Coordinator> {
     );
     _state = newState;
     setState(() {});
-    _saveTasksToSharedPrefs();
+    _persistData();
   }
 
   void _checkTask(int index) {
@@ -223,15 +255,17 @@ class _WidgetState extends flutter.State<Coordinator> {
     );
     _state = newState;
     setState(() {});
-    _saveTasksToSharedPrefs();
+    _persistData();
   }
 
-  void _pinTask(int index) {
+  void _pinTask(int id) {
     final state = _state;
     final taskStates = state.taskStates;
     if (taskStates is! Ready<TaskStates>) illegalState(state, "_pinTask");
-    if (taskStates.value[index].removed) illegalState(state, "_pinTask");
-    print("tasks before pinning ${taskStates.value.join(",")}");
+    final findResult = taskStates.value.find((t) => t.task.id == id);
+    if (findResult is None) illegalState(state, "_pinTask");
+    final (index, taskState) = findResult.unwrap();
+    if (taskState.removed) illegalState(state, "_pinTask");
     final newState = state.copy(
       taskStates: taskStates.copy(
         taskStates.value.replaceBy(
@@ -244,35 +278,12 @@ class _WidgetState extends flutter.State<Coordinator> {
         )
       ),
     );
-    print("tasks after pinning ${(newState.taskStates as Ready<TaskStates>).value.join(",")}");
     _state = newState;
     setState(() {});
-    _saveTasksToSharedPrefs();
+    _persistData();
   }
 
-  void _bitch() {
-    final state = _state;
-    final taskStates = state.taskStates;
-    if (taskStates is! Ready<TaskStates>) illegalState(state, "_checkTask");
-    final newState = state.copy(
-      taskStates: taskStates.copy(
-        taskStates.value.addAll(
-          <TaskState>[
-            (task: (name: "Task 1", dueDate: DateTime.now(), done: false, pinned: false), removed: true),
-            (task: (name: "Task 2", dueDate: DateTime.now(), done: false, pinned: false), removed: true),
-            (task: (name: "Task 3", dueDate: DateTime.now(), done: false, pinned: false), removed: true),
-            (task: (name: "Task 4", dueDate: DateTime.now(), done: false, pinned: false), removed: true),
-            (task: (name: "Task 5", dueDate: DateTime.now(), done: false, pinned: false), removed: true),
-            (task: (name: "Task 6", dueDate: DateTime.now(), done: false, pinned: false), removed: true),
-            (task: (name: "Task 7", dueDate: DateTime.now(), done: false, pinned: false), removed: true),
-            (task: (name: "Task 8", dueDate: DateTime.now(), done: false, pinned: false), removed: true),
-          ],
-        )
-      ),
-    );
-    _state = newState;
-    setState(() {});
-  }
+  void _bitch() {}
 
   @override
   flutter.Widget build(flutter.BuildContext context) {

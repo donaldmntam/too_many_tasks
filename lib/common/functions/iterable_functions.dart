@@ -1,4 +1,5 @@
 import 'package:too_many_tasks/common/monads/result.dart';
+import 'package:too_many_tasks/common/monads/optional.dart';
 
 extension ExtendedIterable<T> on Iterable<T> {
   int countIf(bool Function(T e) predicate) {
@@ -16,6 +17,15 @@ extension ExtendedIterable<T> on Iterable<T> {
       i++;
       return transformed;
     });
+  }
+
+  Optional<(int, T)> find(bool Function(T e) predicate) {
+    var i = 0;
+    for (final e in this) {
+      if (predicate(e)) return Optional.some((i, e));
+      i++;
+    }
+    return Optional.none;
   }
 }
 

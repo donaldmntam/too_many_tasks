@@ -17,6 +17,9 @@ import './widgets/filter_menu.dart';
 import 'package:too_many_tasks/common/overlay/service.dart';
 import 'package:too_many_tasks/common/theme/theme.dart';
 import 'dart:async';
+import 'package:too_many_tasks/common/widgets/task_dialog/types.dart' as task_dialog;
+import 'package:too_many_tasks/common/functions/iterable_functions.dart';
+import 'package:too_many_tasks/common/monads/optional.dart';
 
 // TODO: animation when task is updated
 // TODO: loading state
@@ -71,23 +74,28 @@ class _State extends State<Page> {
     showDialog(
       context: context,
       builder: (_) => const TaskDialog(task: null, presets: IListConst([]))
-    ).then((task) => widget.listener.onAddTask(task));
+    ).then((task) {
+      if (task == null) return;
+      widget.listener.onAddTask(task);
+    });
   }
 
-  void onEditTask(int index) async {
+  void onEditTask(int id) async {
     final taskStates = widget.taskStates;
     if (taskStates is! Ready<TaskStates>) illegalState(widget.taskStates, "onEditTask");
+    final (_, taskState) = taskStates.value.find((t) => t.task.id == id).unwrap();
+
     final newTask = (
       await showDialog(
         context: context,
         builder: (_) => TaskDialog(
-          task: taskStates.value[index].task,
+          task: taskState.task,
           presets: const IListConst([]),
         ),
       )
-    ) as Task?;
+    ) as task_dialog.Result?;
     if (newTask == null) return;
-    widget.listener.onEditTask(index, newTask);
+    widget.listener.onEditTask(id, newTask);
   }
 
   void openFilterMenu() async {
@@ -116,6 +124,7 @@ class _State extends State<Page> {
   @override
   Widget build(BuildContext context) {
     final tasks = widget.taskStates;
+    final theme = Theme.of(context);
     return Scaffold(
       body: LayoutBuilder(
         builder: (context, constraints) {
@@ -143,19 +152,18 @@ class _State extends State<Page> {
                     + Page.clipboardOverlapHeight,
                   topRightChild: switch (tasks) {
                     Loading() => null,
-                    Ready() => null,
-                    // Ready() => Padding(
-                    //   padding: const EdgeInsets.only(
-                    //     top: 12,
-                    //     left: Page.clipboardBorderRadius,
-                    //     right: Page.clipboardBorderRadius,
-                    //   ),
-                    //   child: FittedBox(
-                    //     fit: BoxFit.contain,
-                    //     alignment: Alignment.centerRight,
-                    //     child: FilterButton(onTap: openFilterMenu)
-                    //   )
-                    // ),
+                    Ready() => Padding(
+                      padding: const EdgeInsets.only(
+                        top: 12,
+                        left: Page.clipboardBorderRadius,
+                        right: Page.clipboardBorderRadius,
+                      ),
+                      child: FittedBox(
+                        fit: BoxFit.contain,
+                        alignment: Alignment.centerRight,
+                        child: FilterButton(onTap: openFilterMenu)
+                      )
+                    ),
                     Error() => todo(),
                   },
                   child: switch (tasks) {
@@ -182,6 +190,8 @@ class _State extends State<Page> {
                   child: SizedBox.square(
                     dimension: _fabSize,
                     child: FloatingActionButton(
+                      backgroundColor: theme.colors.surface,
+                      foregroundColor: theme.colors.onBackground400,
                       onPressed: onFabTap,
                       child: const Icon(
                         Icons.add,
