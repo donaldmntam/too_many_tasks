@@ -6,7 +6,7 @@ import 'package:too_many_tasks/common/models/task.dart';
 import 'package:too_many_tasks/common/widgets/task_dialog/task_dialog.dart';
 import 'package:too_many_tasks/task_list/listener.dart';
 import 'package:too_many_tasks/task_list/widgets/clipboard.dart';
-import 'package:too_many_tasks/task_list/widgets/filter_button.dart';
+import 'package:too_many_tasks/task_list/widgets/button.dart';
 import 'package:too_many_tasks/task_list/widgets/top/top.dart';
 import '../common/models/loadable.dart';
 import 'widgets/ready_content/ready_content.dart' as ready;
@@ -151,19 +151,19 @@ class _State extends State<Page> {
                   height: constraints.maxHeight 
                     - Page.topHeight(context) 
                     + Page.clipboardOverlapHeight,
+                  topLeftChild: switch (tasks) {
+                    Loading() => null,
+                    Ready() => _CornerButton(
+                      alignment: Alignment.centerLeft,
+                      child: SortButton(onTap: openFilterMenu),
+                    ),
+                    Error() => todo(),
+                  },
                   topRightChild: switch (tasks) {
                     Loading() => null,
-                    Ready() => Padding(
-                      padding: const EdgeInsets.only(
-                        top: 12,
-                        left: Page.clipboardBorderRadius,
-                        right: Page.clipboardBorderRadius,
-                      ),
-                      child: FittedBox(
-                        fit: BoxFit.contain,
-                        alignment: Alignment.centerRight,
-                        child: FilterButton(onTap: openFilterMenu)
-                      )
+                    Ready() => _CornerButton(
+                      alignment: Alignment.centerRight,
+                      child: FilterButton(onTap: openFilterMenu),
                     ),
                     Error() => todo(),
                   },
@@ -206,6 +206,32 @@ class _State extends State<Page> {
             ],
           );
         }
+      )
+    );
+  }
+}
+
+class _CornerButton extends StatelessWidget {
+  final Alignment alignment;
+  final Widget child;
+
+  const _CornerButton({
+    required this.alignment,
+    required this.child,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(
+        top: 12,
+        left: Page.clipboardBorderRadius,
+        right: Page.clipboardBorderRadius,
+      ),
+      child: FittedBox(
+        fit: BoxFit.contain,
+        alignment: alignment,
+        child: child,
       )
     );
   }

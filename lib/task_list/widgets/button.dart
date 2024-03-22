@@ -2,16 +2,17 @@ import 'package:flutter/material.dart' hide Theme, BottomSheet;
 import 'package:too_many_tasks/common/theme/theme.dart';
 import 'package:flutter_gen/gen_l10n/strings.dart';
 
-class FilterButton extends StatelessWidget {
+class _Button extends StatelessWidget {
   final _key = GlobalKey();
+  final IconData icon;
+  final String text;
   final void Function() onTap;
 
-  FilterButton({super.key, required this.onTap});
+  _Button(this.icon, this.text, this.onTap);
   
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final strings = Strings.of(context);
     return GestureDetector(
       key: _key,
       onTap: () {
@@ -25,11 +26,11 @@ class FilterButton extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
-              Icons.filter_alt_outlined,
+              icon,
               color: theme.colors.onBackground400,
             ),
             Text(
-              strings.task_list_filter_button,
+              text,
               style: theme.textStyle(
                 size: 16,
                 color: theme.colors.onBackground400,
@@ -38,6 +39,38 @@ class FilterButton extends StatelessWidget {
           ]
         ),
       ),
+    );
+  }
+}
+
+class SortButton extends StatelessWidget {
+  final void Function() onTap;
+
+  const SortButton({super.key, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final strings = Strings.of(context);
+    return _Button(
+      Icons.swap_vert_outlined,
+      strings.task_list_filter_button,
+      onTap,
+    );
+  }
+}
+
+class FilterButton extends StatelessWidget {
+  final void Function() onTap;
+
+  const FilterButton({super.key, required this.onTap});
+  
+  @override
+  Widget build(BuildContext context) {
+    final strings = Strings.of(context);
+    return _Button(
+      Icons.filter_alt_outlined,
+      strings.task_list_filter_button,
+      onTap,
     );
   }
 }
