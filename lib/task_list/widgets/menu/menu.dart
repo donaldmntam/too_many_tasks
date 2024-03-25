@@ -2,38 +2,43 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter/material.dart' show Icons;
 import 'package:too_many_tasks/common/overlay/bottom_sheet.dart';
 import 'package:too_many_tasks/common/theme/theme.dart';
-import './filter.dart';
 import 'package:too_many_tasks/common/widgets/highlighted/highlighted.dart';
+import 'package:too_many_tasks/common/functions/iterable_functions.dart';
+import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 
 Color textColor(Theme theme) => theme.colors.onBackground400;
 
-class FilterMenu extends StatefulWidget {
-  final Filter? initialChosenFilter;
-  final void Function(Filter?) shouldUpdateFilter;
+class Menu extends StatefulWidget {
+  final String title;
+  final List<String> items;
+  final int initialChosenIndex;
+  final void Function(int) didSelectItem;
 
-  const FilterMenu({
+  const Menu({
     super.key,
-    required this.initialChosenFilter,
-    required this.shouldUpdateFilter,
+    required this.title,
+    required this.items,
+    required this.initialChosenIndex,
+    required this.didSelectItem,
   });
 
   @override
-  State<FilterMenu> createState() => _State();
+  State<Menu> createState() => _State();
 }
 
-class _State extends State<FilterMenu> {
-  late Filter? chosenFilter;
+class _State extends State<Menu> {
+  late int chosenIndex;
 
   @override
   void initState() {
     super.initState();
-    chosenFilter = widget.initialChosenFilter;
+    chosenIndex = widget.initialChosenIndex;
   }
 
-  void onTap(Filter? filter) {
-    chosenFilter = filter;
+  void onTap(int index) {
+    chosenIndex = index;
     setState(() {});
-    widget.shouldUpdateFilter(filter);
+    widget.didSelectItem(index);
   }
 
   @override
@@ -51,13 +56,11 @@ class _State extends State<FilterMenu> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             const SizedBox(height: 36),
-            const _TitleItem(),
+            _TitleItem(widget.title),
             const SizedBox(height: 36),
-            _NoFilterButtonItem(chosenFilter != null, onTap),
-            const SizedBox(height: 16),
-            _FilterItem(const DueToday(), chosenFilter, onTap),
-            const SizedBox(height: 16),
-            _FilterItem(const Overdue(), chosenFilter, onTap),
+            ...widget.items.mapIndexed<Widget>((item, i) =>
+              _Item(i, item, chosenIndex == i, widget.didSelectItem),
+            ).toList().addBetween(const SizedBox(height: 16)),
             const SizedBox(height: 24),
           ],
         ),
@@ -67,7 +70,9 @@ class _State extends State<FilterMenu> {
 }
 
 class _TitleItem extends StatelessWidget {
-  const _TitleItem();
+  final String title;
+  
+  const _TitleItem(this.title);
 
   @override
   Widget build(BuildContext context) {
@@ -75,21 +80,12 @@ class _TitleItem extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        // Icon(
-        //   Icons.filter_alt_outlined,
-        //   color: theme.colors.onBackground400,
-        //   size: 32,
-        // ),
-        // const SizedBox(width: 10),
         Highlighted(
-          // TODO: translation
-          'Filter',
+          title,
           style: theme.textStyle(
             size: 24,
             color: textColor(theme),
             weight: FontWeight.bold,
-            // decoration: TextDecoration.underline,
-            // decorationStyle: TextDecorationStyle.wavy,
           ),
         ),
       ],
@@ -97,55 +93,13 @@ class _TitleItem extends StatelessWidget {
   }
 }
 
-class _NoFilterButtonItem extends StatelessWidget {
-  final bool hasFilterChosen;
-  final void Function(Filter?) onTap;
-
-  const _NoFilterButtonItem(
-    this.hasFilterChosen,
-    this.onTap,
-  );
-
-  @override
-  Widget build(BuildContext context) {
-    return _Item(
-      // TODO: translation
-      'None',
-      !hasFilterChosen,
-      () => onTap(null),
-    );
-  }
-}
-
-class _FilterItem extends StatelessWidget {
-  final Filter filter;
-  final Filter? chosenFilter;
-  final void Function(Filter) onTap;
-
-  const _FilterItem(
-    this.filter,
-    this.chosenFilter,
-    this.onTap,
-  );
-
-  @override
-  Widget build(BuildContext context) {
-    final chosenFilter = this.chosenFilter;
-
-    return _Item(
-      filter.title,
-      chosenFilter != null && filter.isSameFilterAs(chosenFilter),
-      () => onTap(filter),
-    );
-  }
-}
-
 class _Item extends StatelessWidget {
+  final int index;
   final String title;
   final bool chosen;
-  final void Function() onTap;
+  final void Function(int) onTap;
 
-  const _Item(this.title, this.chosen, this.onTap);
+  const _Item(this.index, this.title, this.chosen, this.onTap);
 
   @override
   Widget build(BuildContext context) {
@@ -153,7 +107,7 @@ class _Item extends StatelessWidget {
     
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
-      onTap: onTap,
+      onTap: () => onTap(index),
       child: Row(
         children: [
           Icon(

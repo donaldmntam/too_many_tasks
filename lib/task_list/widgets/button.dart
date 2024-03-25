@@ -53,7 +53,7 @@ class SortButton extends StatelessWidget {
     final strings = Strings.of(context);
     return _Button(
       Icons.swap_vert_outlined,
-      strings.task_list_filter_button,
+      strings.task_list_sort_button,
       onTap,
     );
   }

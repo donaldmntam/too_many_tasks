@@ -25,18 +25,6 @@ extension ExtendedFilter on Filter {
     }
   }
 
-  // TODO: localization
-  String get title {
-    switch (this) {
-      case DueToday():
-        return 'Due Today';
-      case Paused():
-        return 'Paused';
-      case Overdue():
-        return 'Overdue';
-    }
-  }
-
   bool Function(Task) predicate(DateTime today) {
     switch (this) {
       case DueToday():

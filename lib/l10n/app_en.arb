@@ -7,7 +7,20 @@
     "task_dialog_new_task_add_button": "ADD",
     "task_dialog_edit_task_confirm_button": "OK",
 
+    "task_list_sort_button": "Sort",
+    "task_list_sort_menu_title": "Sort",
+    "task_list_sort_menu_creation_date_button": "Creation Date",
+    "task_list_sort_menu_due_date_button": "Due Date",
+    "task_list_sort_menu_task_name_by_ascending_order_button": "Task Name by Ascending Order",
+    "task_list_sort_menu_task_name_by_descending_order_button": "Task Name by Descending Order",
+
     "task_list_filter_button": "Filter",
+    "task_list_filter_menu_title": "Filter",
+    "task_list_filter_menu_none_button": "None",
+    "task_list_filter_menu_due_today_button": "Due Today",
+    "task_list_filter_menu_paused_button": "Paused",
+    "task_list_filter_menu_overdue_button": "Overdue",
+
     "task_list_progress": "Today's Progress",
 
     "task_card_overdue": "Overdue"
