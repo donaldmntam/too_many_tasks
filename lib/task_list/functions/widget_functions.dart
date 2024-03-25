@@ -7,7 +7,7 @@ import 'package:too_many_tasks/common/widgets/proportion_box/proportion_box.dart
 import 'package:too_many_tasks/task_list/data/widget_data.dart';
 import 'package:too_many_tasks/task_list/widgets/task_card/state.dart' as task_card;
 import 'package:too_many_tasks/task_list/widgets/task_card/task_card.dart' as task_card;
-import 'package:too_many_tasks/task_list/widgets/filter.dart';
+import 'package:too_many_tasks/common/models/filter.dart';
 import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 
 // enum _TaskType {

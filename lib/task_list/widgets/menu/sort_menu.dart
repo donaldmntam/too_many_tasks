@@ -7,12 +7,12 @@ import 'package:too_many_tasks/common/monads/optional.dart';
 
 class SortMenu extends StatelessWidget {
   final Sort? initialChosenSort;
-  final void Function(Sort?) shouldUpdateFilter;
+  final void Function(Sort?) shouldUpdateSort;
 
   const SortMenu({
     super.key,
     required this.initialChosenSort,
-    required this.shouldUpdateFilter,
+    required this.shouldUpdateSort,
   });
 
   @override
@@ -41,7 +41,7 @@ class SortMenu extends StatelessWidget {
       title: strings.task_list_sort_menu_title,
       items: buttons.map((button) => button.title).toList(),
       initialChosenIndex: index,
-      didSelectItem: (i) => shouldUpdateFilter(buttons[i].sort),
+      didSelectItem: (i) => shouldUpdateSort(buttons[i].sort),
     );
   }
 }

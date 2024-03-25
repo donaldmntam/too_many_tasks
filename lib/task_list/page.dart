@@ -11,15 +11,17 @@ import 'package:too_many_tasks/task_list/widgets/top/top.dart';
 import '../common/models/loadable.dart';
 import 'widgets/ready_content/ready_content.dart' as ready;
 import './widgets/loading_content.dart'as loading;
-import './widgets/filter.dart';
+import 'package:too_many_tasks/common/models/filter.dart';
 import 'package:too_many_tasks/common/overlay/bottom_sheet.dart';
-import './widgets/filter_menu.dart';
+import './widgets/menu/filter_menu.dart';
 import 'package:too_many_tasks/common/overlay/service.dart';
 import 'package:too_many_tasks/common/theme/theme.dart';
 import 'dart:async';
 import 'package:too_many_tasks/common/widgets/task_dialog/types.dart' as task_dialog;
 import 'package:too_many_tasks/common/functions/iterable_functions.dart';
 import 'package:too_many_tasks/common/monads/optional.dart';
+import './widgets/menu/sort_menu.dart';
+import 'package:too_many_tasks/common/models/sort.dart';
 
 // TODO: animation when task is updated
 // TODO: loading state
@@ -62,6 +64,7 @@ class Page extends StatefulWidget {
 
 class _State extends State<Page> {
   Filter? filter;
+  Sort sort = const DueDate();
 
   @override
   void initState() {
@@ -122,6 +125,30 @@ class _State extends State<Page> {
     setState(() {});
   }
 
+  void openSortMenu() async {
+    final overlay = OverlayService.of(context);
+    final theme = Theme.of(context);
+
+    final completer = Completer<Sort>();
+    overlay.openBottomSheet(
+      BottomSheet(builder: (context) =>
+        Container(
+          width: double.infinity,
+          decoration: theme.bottomSheetDecoration,
+          child: SortMenu(
+            initialChosenSort: sort,
+            shouldUpdateSort: completer.complete,
+          ),
+        ),
+        onTapBackdrop: () => overlay.closeBottomSheet(),
+      ),
+    );
+    final newChosenSort = await completer.future;
+    overlay.closeBottomSheet();
+    sort = newChosenSort;
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     final tasks = widget.taskStates;
@@ -155,7 +182,7 @@ class _State extends State<Page> {
                     Loading() => null,
                     Ready() => _CornerButton(
                       alignment: Alignment.centerLeft,
-                      child: SortButton(onTap: openFilterMenu),
+                      child: SortButton(onTap: openSortMenu),
                     ),
                     Error() => todo(),
                   },
