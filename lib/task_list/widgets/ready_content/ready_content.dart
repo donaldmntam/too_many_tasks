@@ -5,6 +5,7 @@ import 'package:too_many_tasks/task_list/widgets/ready_content/task_list.dart';
 import '../task_card/task_card.dart' as task_card;
 import 'package:flutter/widgets.dart' as widgets show State;
 import 'package:too_many_tasks/common/models/filter.dart';
+import 'package:too_many_tasks/common/models/sort.dart';
 
 const _linePadding = 8.0;
 const _returnButtonPadding = 16.0;
@@ -14,6 +15,7 @@ class Content extends StatefulWidget {
   final double fabClearance;
   final TaskStates taskStates;
   final Filter? filter;
+  final Sort sort;
   final task_card.Listener listener;
 
   const Content({
@@ -21,6 +23,7 @@ class Content extends StatefulWidget {
     required this.fabClearance,
     required this.taskStates,
     required this.filter,
+    required this.sort,
     required this.listener
   });
 
@@ -84,6 +87,7 @@ class _ContentState extends widgets.State<Content> {
                 child: TaskList(
                   taskStates: widget.taskStates,
                   filter: widget.filter,
+                  sort: widget.sort,
                   bottomPadding: bottomInset + widget.fabClearance, 
                   listener: widget.listener,
                   scrollController: controller

@@ -199,6 +199,7 @@ class _State extends State<Page> {
                     Ready(value: final taskStates) => ready.Content(
                       taskStates: taskStates,
                       filter: filter,
+                      sort: sort,
                       listener: (
                         onEditPressed: onEditTask,
                         onCheckMarkPressed: widget.listener.onCheckTask,

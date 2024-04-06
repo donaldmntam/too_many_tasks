@@ -10,6 +10,7 @@ import 'package:too_many_tasks/task_list/widgets/task_card/task_card.dart' as ta
 import 'package:too_many_tasks/task_list/widgets/task_card/state.dart' as task_card;
 import 'package:too_many_tasks/task_list/functions/task_functions.dart' as functions;
 import 'package:too_many_tasks/common/models/filter.dart';
+import 'package:too_many_tasks/common/models/sort.dart';
 
 const _addAnimationDuration = Duration(milliseconds: 500);
 const _removeAnimationDuration = Duration(milliseconds: 500);
@@ -17,6 +18,7 @@ const _removeAnimationDuration = Duration(milliseconds: 500);
 class TaskList extends StatefulWidget {
   final TaskStates taskStates;
   final Filter? filter;
+  final Sort sort;
   final double bottomPadding;
   final task_card.Listener listener;
   final ScrollController scrollController;
@@ -25,6 +27,7 @@ class TaskList extends StatefulWidget {
     super.key,
     required this.taskStates,
     required this.filter,
+    required this.sort,
     required this.bottomPadding,
     required this.listener,
     required this.scrollController,
@@ -167,6 +170,7 @@ class _TaskListState extends widgets.State<TaskList>
       theme: theme,
       taskStates: widget.taskStates,
       filter: widget.filter,
+      sort: widget.sort,
       cardStates: cardStates,
       listener: widget.listener,
     );

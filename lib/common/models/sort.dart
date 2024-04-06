@@ -31,7 +31,7 @@ extension ExtendedSort on Sort {
     }
   }
 
-  int Function(Task a, Task b) comparator(DateTime today) {
+  int Function(Task a, Task b) get comparator {
     switch (this) {
       case CreationDate():
         todo('need to add creation date to every task');
@@ -39,9 +39,11 @@ extension ExtendedSort on Sort {
         return (Task a, Task b) => a.dueDate.millisecondsSinceEpoch
           - b.dueDate.millisecondsSinceEpoch;
       case AscendingTaskName():
-        return (Task a, Task b) => a.name.compareTo(b.name);
+        return (Task a, Task b) => 
+          a.name.toLowerCase().compareTo(b.name.toLowerCase());
       case DescendingTaskName():
-        return (Task a, Task b) => b.name.compareTo(a.name);
+        return (Task a, Task b) => 
+          b.name.toLowerCase().compareTo(a.name.toLowerCase());
     }
   }
 }
