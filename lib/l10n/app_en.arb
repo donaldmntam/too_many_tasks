@@ -23,5 +23,8 @@
 
     "task_list_progress": "Today's Progress",
 
-    "task_card_overdue": "Overdue"
+    "task_card_overdue": "Overdue",
+
+    "task_list_empty_title": "You currently have no tasks pending.",
+    "task_list_empty_button": "Add New Task"
 }

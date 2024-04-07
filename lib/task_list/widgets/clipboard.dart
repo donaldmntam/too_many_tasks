@@ -35,6 +35,8 @@ class Clipboard extends StatelessWidget {
                 top: Page.clipboardClipHeight - Page.clipboardClipOverlapHeight,
               ),
               child: Container(
+                width: double.infinity,
+                height: double.infinity,
                 padding: const EdgeInsets.only(
                   top: Page.clipboardTopClearance,
                 ),

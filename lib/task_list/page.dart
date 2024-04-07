@@ -10,6 +10,7 @@ import 'package:too_many_tasks/task_list/widgets/button.dart';
 import 'package:too_many_tasks/task_list/widgets/top/top.dart';
 import '../common/models/loadable.dart';
 import 'widgets/ready_content/ready_content.dart' as ready;
+import 'widgets/empty_content/empty_content.dart';
 import './widgets/loading_content.dart'as loading;
 import 'package:too_many_tasks/common/models/filter.dart';
 import 'package:too_many_tasks/common/overlay/bottom_sheet.dart';
@@ -71,7 +72,7 @@ class _State extends State<Page> {
     super.initState();
   }
 
-  void onFabTap() {
+  void openNewTaskDialog() {
     final tasks = widget.taskStates;
     if (tasks is! Ready<TaskStates>) illegalState(widget.taskStates, "onFabTap");
     showDialog(
@@ -196,18 +197,24 @@ class _State extends State<Page> {
                   },
                   child: switch (tasks) {
                     Loading() => const loading.Content(),
-                    Ready(value: final taskStates) => ready.Content(
-                      taskStates: taskStates,
-                      filter: filter,
-                      sort: sort,
-                      listener: (
-                        onEditPressed: onEditTask,
-                        onCheckMarkPressed: widget.listener.onCheckTask,
-                        onPinPressed: widget.listener.onPinTask,
-                        onRemove: widget.listener.onRemoveTask,
-                      ),
-                      fabClearance: _fabSize + _fabPadding.bottom,
-                    ),
+                    Ready(value: final taskStates) => 
+                      switch (taskStates.count((t) => !t.removed)) {
+                        0 => EmptyContent(
+                          onAddNewTask: openNewTaskDialog,
+                        ),
+                        _ => ready.Content(
+                          taskStates: taskStates,
+                          filter: filter,
+                          sort: sort,
+                          listener: (
+                            onEditPressed: onEditTask,
+                            onCheckMarkPressed: widget.listener.onCheckTask,
+                            onPinPressed: widget.listener.onPinTask,
+                            onRemove: widget.listener.onRemoveTask,
+                          ),
+                          fabClearance: _fabSize + _fabPadding.bottom,
+                        ),
+                      },
                     Error() => todo(),
                   }
                 ),
@@ -222,7 +229,7 @@ class _State extends State<Page> {
                       shape: const CircleBorder(),
                       backgroundColor: theme.colors.secondary,
                       foregroundColor: theme.colors.onSecondary,
-                      onPressed: onFabTap,
+                      onPressed: openNewTaskDialog,
                       child: const Icon(
                         Icons.add,
                         size: _fabSize - _fabInnerPadding
